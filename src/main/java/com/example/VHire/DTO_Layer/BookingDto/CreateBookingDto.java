@@ -1,0 +1,20 @@
+package com.example.VHire.DTO_Layer.BookingDto;
+
+import org.antlr.v4.runtime.misc.NotNull;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+public class CreateBookingDto {
+
+    @NotNull
+    private long worker_id;
+    @NotNull
+    private LocalDate date ;
+    @NotNull
+    private LocalTime startTime;
+    @NotNull
+    private LocalTime endTime;
+
+
+}
