@@ -2,10 +2,7 @@ package com.example.VHire.Entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,19 +30,24 @@ public class Bookings {
     private User worker;
 
     @Column(nullable = false)
+    @NonNull
     private LocalDate date;
 
     @Column(nullable = false)
+    @NonNull
     private LocalTime startTime;
 
     @Column(nullable = false)
+    @NonNull
     private LocalTime endTime;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @NonNull
     private BookingStatus status;
 
     @Column(nullable = false)
+    @NonNull
     private LocalDateTime createdAt;
 
     @Column(nullable = false)

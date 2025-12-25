@@ -10,7 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-public interface AvailabilitySlotRepository extends JpaRepository<Availability_slot,Integer> {
+public interface AvailabilitySlotRepository extends JpaRepository<Availability_slot,Long> {
+
 
 
     @Query("""
@@ -27,4 +28,6 @@ public interface AvailabilitySlotRepository extends JpaRepository<Availability_s
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime
     );
+
+    List<Availability_slot> findByWorkerAndDateOrderByStartTime(User worker, LocalDate date);
 }
