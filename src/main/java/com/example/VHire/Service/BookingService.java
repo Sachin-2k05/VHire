@@ -10,6 +10,7 @@ import com.example.VHire.Repository.AvailabilitySlotRepository;
 import com.example.VHire.Repository.BookingRepository;
 import com.example.VHire.Repository.UserRepository;
 import com.example.VHire.Repository.WorkerProfileRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class BookingService {
+public class BookingService{
 
     private final AvailabilityService availabilityService;
     private final UserRepository userRepository;
@@ -221,7 +222,18 @@ public class BookingService {
     }
 
 
-    public void AutoRejectExpiredBookings() {
+    public BookingResponseDto getBookingById(long bookingId) {
+        Bookings booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Booking not found with id: " + bookingId
+                        )
+                );
+
+        return mapToBookingResponse(booking);
+    }
+
+    public void AutoRejectExpiredBookings(){
         LocalDateTime now = LocalDateTime.now();
 
         List<Bookings> expiredBookings  = bookingRepository.findExpiredTRequestedBookings(now) ;

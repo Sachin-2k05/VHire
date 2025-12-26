@@ -1,5 +1,7 @@
 package com.example.VHire.Service;
 
+import com.example.VHire.DTO_Layer.AvailabilityDto.AvailabilityRequestDto;
+import com.example.VHire.DTO_Layer.AvailabilityDto.AvailabilityResponseDto;
 import com.example.VHire.Entity.Availability_slot;
 import com.example.VHire.Entity.Role;
 import com.example.VHire.Entity.User;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 
 
@@ -44,36 +47,42 @@ public class AvailabilityService {
                 .isEmpty();
     }
 
-    public void CreateAvailabilitySlot( User worker , LocalDate date, LocalTime startTime, LocalTime endTime ) {
-if(worker.getRole() != Role.Worker){
-        throw new IllegalArgumentException(" only worker can create availability slot");
-}
+    public void createAvailability(User worker, AvailabilityRequestDto dto) {
 
-if(!startTime.isBefore(endTime)){
-    throw new IllegalArgumentException(" startTime must be before endTime");
-}
+        if (worker.getRole() != Role.Worker) {
+            throw new IllegalArgumentException("Only workers can create availability slots");
+        }
 
-     if(date.isBefore(LocalDate.now())) {
-         throw new IllegalArgumentException(" Cannot create availability slot because date is before now");
+        LocalDate date = dto.getDate();
+        LocalTime startTime = dto.getStartTime();
+        LocalTime endTime = dto.getEndTime();
 
-     }
-     boolean overlapExists = bookingRepository.existsAcceptedOverlap(worker, date, startTime, endTime);
-     if(overlapExists){
-         throw new IllegalArgumentException(" Availability slot overlapss ");
+        if (!startTime.isBefore(endTime)) {
+            throw new IllegalArgumentException("Start time must be before end time");
+        }
 
-     }
+        if (date.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot create availability slot in the past");
+        }
 
-     Availability_slot slot = new Availability_slot();
-     slot.setWorker(worker);
-     slot.setDate(date);
-     slot.setStartTime(startTime);
-     slot.setEndTime(endTime);
+        boolean overlapExists =
+                bookingRepository.existsAcceptedOverlap(
+                        worker, date, startTime, endTime
+                );
 
-     availabilitySlotRepository.save(slot);
+        if (overlapExists) {
+            throw new IllegalStateException("Availability slot overlaps with an accepted booking");
+        }
 
+        Availability_slot slot = new Availability_slot();
+        slot.setWorker(worker);
+        slot.setDate(date);
+        slot.setStartTime(startTime);
+        slot.setEndTime(endTime);
 
-
+        availabilitySlotRepository.save(slot);
     }
+
 
 
     public void removeAvailabilitySlot(Long slotId , User worker){
@@ -88,13 +97,29 @@ if(!startTime.isBefore(endTime)){
 
     }
 
-    public List<Availability_slot> getAvailabilitySlot(User worker , LocalDate date ){
-        if(date.isBefore(LocalDate.now())){
-            throw new IllegalArgumentException(" Cannot get availability slot because date is before now");
+    public List<AvailabilityResponseDto> getAvailability(User worker) {
 
+        if (worker.getRole() != Role.Worker) {
+            throw new IllegalArgumentException("Only workers can view availability");
         }
-        return availabilitySlotRepository.findByWorkerAndDateOrderByStartTime(worker, date);
+
+        List<Availability_slot> slots =
+                availabilitySlotRepository
+                        .findByWorkerAndDateOrderByStartTime(worker);
+
+        return slots.stream()
+                .map(this::mapToAvailabilityResponse)
+                .toList();
     }
+    private AvailabilityResponseDto mapToAvailabilityResponse(Availability_slot slot) {
+        AvailabilityResponseDto dto = new AvailabilityResponseDto();
+        dto.setId(slot.getId());
+        dto.setDate(slot.getDate());
+        dto.setStartTime(slot.getStartTime());
+        dto.setEndTime(slot.getEndTime());
+        return dto;
+    }
+
 
 
 

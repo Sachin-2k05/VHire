@@ -29,5 +29,5 @@ public interface AvailabilitySlotRepository extends JpaRepository<Availability_s
             @Param("endTime") LocalTime endTime
     );
 
-    List<Availability_slot> findByWorkerAndDateOrderByStartTime(User worker, LocalDate date);
+    List<Availability_slot> findByWorkerAndDateOrderByStartTime(User worker);
 }
