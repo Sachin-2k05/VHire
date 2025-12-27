@@ -56,18 +56,6 @@ public class BookingController {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     private User getCurrentUser() {
         throw new UnsupportedOperationException(
                 "Injected from SecurityContext after Spring Security");
