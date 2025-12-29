@@ -9,8 +9,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,33 +26,37 @@ public class AvailabilityController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createAvailability( @Valid @RequestBody AvailabilityRequestDto availabilityRequestDto) {
-        User currentuser = getCurrentUser();
-        availabilityService.createAvailability(currentuser , availabilityRequestDto);
+    @PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<Void> createAvailability(@AuthenticationPrincipal User worker, @Valid @RequestBody AvailabilityRequestDto availabilityRequestDto) {
+
+        availabilityService.createAvailability(worker , availabilityRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 
     @DeleteMapping("/{availabilityID}")
-    public ResponseEntity<Void> deleteAvailability(@Valid @PathVariable Long availabilityID) {
-        User currentuser = getCurrentUser();
-        availabilityService.removeAvailabilitySlot(availabilityID, currentuser);
+    @PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<Void> deleteAvailability(
+            @AuthenticationPrincipal User worker,
+            @Valid @PathVariable Long availabilityID) {
+
+        availabilityService.removeAvailabilitySlot(availabilityID, worker);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
     @GetMapping
-    public ResponseEntity<List<AvailabilityResponseDto>> getMyAvailability() {
+    @PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<List<AvailabilityResponseDto>> getMyAvailability(
+            @AuthenticationPrincipal User worker,
 
-        User currentUser = getCurrentUser();
+            @RequestParam LocalDate date) {
+
+
         return ResponseEntity.ok(
-                availabilityService.getAvailability(currentUser)
+                availabilityService.getAvailability(worker , date)
         );
     }
 
 
-    private User getCurrentUser() {
-        throw new UnsupportedOperationException(
-                " "
-        );
-    }
+
 }

@@ -29,9 +29,9 @@ public class WorkerProfileService{
 
 
 
-    public WorkerProfileResponseDto createProfile(User worker, createWorkerProfileDto dto) {
-
-        userService.validateRole(worker, Role.Worker);
+    public WorkerProfileResponseDto createProfile(
+            User worker,
+            createWorkerProfileDto dto) {
 
         if (workerProfileRepository.existsByUser(worker)) {
             throw new IllegalStateException("Worker profile already exists");
@@ -51,9 +51,9 @@ public class WorkerProfileService{
     }
 
 
-    public WorkerProfileResponseDto updateProfile(User worker,      UpdateWorkerProfileDto dto) {
-
-        userService.validateRole(worker, Role.Worker);
+    public WorkerProfileResponseDto updateProfile(
+            User worker,
+            UpdateWorkerProfileDto dto) {
 
         WorkerProfile profile = getProfileEntityByWorker(worker);
 
@@ -68,6 +68,7 @@ public class WorkerProfileService{
     }
 
 
+
     public WorkerProfileResponseDto getProfileByWorkerId(long workerId) {
 
         User worker = userService.getWorkerEntityById(workerId);
@@ -77,13 +78,13 @@ public class WorkerProfileService{
     }
 
 
+
     public WorkerProfileResponseDto getProfileByWorker(User worker) {
 
-        userService.validateRole(worker, Role.Worker);
         WorkerProfile profile = getProfileEntityByWorker(worker);
-
         return mapToResponse(profile);
     }
+
 
 
 

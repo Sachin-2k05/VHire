@@ -23,7 +23,7 @@ import java.util.List;
 @Transactional
 public class BookingService{
 
-    private final AvailabilityService availabilityService;
+
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final WorkerProfileRepository workerProfileRepository;
@@ -32,13 +32,13 @@ public class BookingService{
     public BookingService(UserRepository userRepository,
                           BookingRepository bookingRepository,
                           WorkerProfileRepository workerProfileRepository,
-                          AvailabilitySlotRepository availabilitySlotRepository,
-                          AvailabilityService availabilityService) {
+                          AvailabilitySlotRepository availabilitySlotRepository
+                          ) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.workerProfileRepository = workerProfileRepository;
         this.availabilitySlotRepository = availabilitySlotRepository;
-        this.availabilityService = availabilityService;
+
     }
 
 
@@ -47,9 +47,7 @@ public class BookingService{
 
     public BookingResponseDto createBooking(User company, CreateBookingDto bookingRequest) throws Throwable {
 
-        if (company.getRole() != Role.Company) {
-            throw new IllegalArgumentException("Only companies can create bookings");
-        }
+
 
         User worker = userRepository.findById(bookingRequest.getWorker_id())
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found"));
@@ -66,16 +64,14 @@ public class BookingService{
             throw new IllegalArgumentException("Date cannot be in the past");
         }
 
-        boolean available = availabilityService.isWorkerAvailable(
-                worker,
-                bookingRequest.getDate(),
-                bookingRequest.getStartTime(),
-                bookingRequest.getEndTime()
-        );
+//        boolean available = availabilityService.isWorkerAvailable(
+//                worker,
+//                bookingRequest.getDate(),
+//                bookingRequest.getStartTime(),
+//                bookingRequest.getEndTime()
+//        );
 
-        if (!available) {
-            throw new IllegalArgumentException("Worker not available");
-        }
+
 
         boolean conflictExists = bookingRepository.existsAcceptedOverlap(
                 worker,
@@ -123,11 +119,9 @@ public class BookingService{
 
 
     @Transactional
-    public BookingResponseDto acceptBooking(long bookingId, User worker) {
+    public BookingResponseDto acceptBooking(Long bookingId, User worker) {
 
-        if (worker.getRole() != Role.Worker) {
-            throw new IllegalArgumentException("Only workers can accept bookings");
-        }
+
 
         Bookings booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
@@ -169,10 +163,9 @@ public class BookingService{
     }
 
      @Transactional
-    public BookingResponseDto rejectBooking(long bookingId, User worker) {
-        if (worker.getRole() != Role.Worker) {
-            throw new IllegalArgumentException("Only workers can reject bookings");
-        }
+    public BookingResponseDto rejectBooking(Long bookingId, User worker) {
+
+
         Bookings booking = bookingRepository.findById(bookingId).orElseThrow(()-> new IllegalArgumentException("Booking not found"));
 
         if(booking.getWorker().getId()!= (worker.getId())){
@@ -195,7 +188,7 @@ public class BookingService{
     }
 
 
-    public BookingResponseDto cancelBooking(long bookingId, User company) {
+    public BookingResponseDto cancelBooking(Long bookingId, User company) {
         if(company.getRole() != Role.Company){
             throw new IllegalArgumentException("Only companies can cancel bookings");
         }

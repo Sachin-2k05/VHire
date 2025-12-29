@@ -36,22 +36,11 @@ public class AvailabilityService {
         this.bookingService = bookingService;
     }
 
-    public boolean isWorkerAvailable(
-            User worker,
-            LocalDate date,
-            LocalTime startTime,
-            LocalTime endTime
-    ) {
-        return !availabilitySlotRepository
-                .findMatchingAvailability(worker, date, startTime, endTime)
-                .isEmpty();
-    }
+
 
     public void createAvailability(User worker, AvailabilityRequestDto dto) {
 
-        if (worker.getRole() != Role.Worker) {
-            throw new IllegalArgumentException("Only workers can create availability slots");
-        }
+
 
         LocalDate date = dto.getDate();
         LocalTime startTime = dto.getStartTime();
@@ -97,15 +86,13 @@ public class AvailabilityService {
 
     }
 
-    public List<AvailabilityResponseDto> getAvailability(User worker) {
+    public List<AvailabilityResponseDto> getAvailability(User worker , LocalDate date ) {
 
-        if (worker.getRole() != Role.Worker) {
-            throw new IllegalArgumentException("Only workers can view availability");
-        }
+
 
         List<Availability_slot> slots =
                 availabilitySlotRepository
-                        .findByWorkerAndDateOrderByStartTime(worker);
+                        .findByWorkerAndDateOrderByStartTime(worker , date);
 
         return slots.stream()
                 .map(this::mapToAvailabilityResponse)

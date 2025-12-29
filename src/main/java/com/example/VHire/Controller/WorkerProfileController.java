@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,29 +27,48 @@ public class WorkerProfileController {
     }
 
     @PostMapping
-    public ResponseEntity<WorkerProfileResponseDto> CreateWorkerProfile(@Valid @RequestBody createWorkerProfileDto Dto) {
-        User currentuser = getCurrentUser();
-        return ResponseEntity.status(HttpStatus.CREATED).body(workerProfileService.createProfile(currentuser, Dto));
+    @PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<WorkerProfileResponseDto> CreateWorkerProfile( @AuthenticationPrincipal User worker,
+                                                                         @Valid @RequestBody createWorkerProfileDto Dto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(workerProfileService.createProfile(worker, Dto));
 
     }
 
 @PutMapping
-    public ResponseEntity<WorkerProfileResponseDto> UpdateWorkerProfile(@Valid @RequestBody UpdateWorkerProfileDto Dto) {
-        User currentuser = getCurrentUser();
-        return ResponseEntity.ok(workerProfileService.updateProfile(currentuser, Dto));
+@PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<WorkerProfileResponseDto> UpdateWorkerProfile(
+        @AuthenticationPrincipal User worker
+        ,@Valid @RequestBody UpdateWorkerProfileDto Dto) {
+
+        return ResponseEntity.ok(workerProfileService.updateProfile(worker, Dto));
     }
 
 
     @GetMapping("/workerId")
-    public ResponseEntity<WorkerProfileResponseDto> getWorkerProfile(@Valid @PathVariable Long workerId) {
+    @PreAuthorize("hasAnyRole('WORKER','COMPANY')")
+    public ResponseEntity<WorkerProfileResponseDto> getWorkerProfile(
+           @Valid @PathVariable Long workerId) {
        return ResponseEntity.ok(workerProfileService.getProfileByWorkerId(workerId));
 
 
     }
 
 
-    public User getCurrentUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<WorkerProfileResponseDto> getMyProfile(
+            @AuthenticationPrincipal User worker
+    ) {
 
+
+
+        return ResponseEntity.ok(
+                workerProfileService.getProfileByWorker(worker)
+        );
     }
+
+
+
+
 }

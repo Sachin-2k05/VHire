@@ -1,6 +1,7 @@
 package com.example.VHire.Service;
 
 
+import com.example.VHire.DTO_Layer.UserDto.UserResponseDto;
 import com.example.VHire.Entity.Role;
 import com.example.VHire.Entity.User;
 import com.example.VHire.Repository.AvailabilitySlotRepository;
@@ -48,7 +49,7 @@ public class UserService {
 
     public User getWorkerEntityById(Long userId) {
         User user = getUserById(userId);
-        validateRole(user, Role.Worker);
+
         return user;
     }
 
@@ -59,5 +60,29 @@ public class UserService {
             );
         }
     }
+
+    public UserResponseDto mapToUserResponse(User user) {
+
+        UserResponseDto dto = new UserResponseDto();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole().name());
+
+        return dto;
+    }
+    public UserResponseDto getUserByIdAsDto(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "User not found with id: " + userId
+                        )
+                );
+
+        return mapToUserResponse(user);
+    }
+
+
 }
 

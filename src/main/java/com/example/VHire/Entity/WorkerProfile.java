@@ -17,7 +17,7 @@ public class WorkerProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @NotNull
-    private long id ;
+    private Long id ;
 
     @OneToOne
     @JoinColumn(name = "user_id" , nullable = false , unique = true)
