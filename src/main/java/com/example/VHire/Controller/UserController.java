@@ -6,6 +6,7 @@ import com.example.VHire.Entity.User;
 import com.example.VHire.Service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserResponseDto> GetUserById(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUserByIdAsDto(userId));
 
@@ -30,13 +31,12 @@ public class UserController {
 
     @GetMapping("/myProfile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserResponseDto> GetCurrentUser() {
-        User currentUser = getcurrentUser() ;
+    public ResponseEntity<UserResponseDto> GetCurrentUser(@AuthenticationPrincipal User worker) {
 
-        return ResponseEntity.ok(userService.mapToUserResponse(currentUser));
+
+        return ResponseEntity.ok(userService.mapToUserResponse(worker));
     }
-    private User getcurrentUser() {
-        throw new UnsupportedOperationException("Not supported yet.");
+
 
     }
 }

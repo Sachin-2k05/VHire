@@ -2,20 +2,20 @@ package com.example.VHire.Service;
 
 import com.example.VHire.DTO_Layer.BookingDto.BookingResponseDto;
 import com.example.VHire.DTO_Layer.BookingDto.CreateBookingDto;
-import com.example.VHire.Entity.BookingStatus;
-import com.example.VHire.Entity.Bookings;
-import com.example.VHire.Entity.Role;
-import com.example.VHire.Entity.User;
+import com.example.VHire.Entity.*;
 import com.example.VHire.Repository.AvailabilitySlotRepository;
 import com.example.VHire.Repository.BookingRepository;
 import com.example.VHire.Repository.UserRepository;
 import com.example.VHire.Repository.WorkerProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 
@@ -49,10 +49,10 @@ public class BookingService{
 
 
 
-        User worker = userRepository.findById(bookingRequest.getWorker_id())
+        User worker = userRepository.findById(bookingRequest.getWorkerId())
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found"));
 
-        if (worker.getRole() != Role.Worker) {
+        if (worker.getRole() != Role.WORKER) {
             throw new IllegalArgumentException("Selected user is not a worker");
         }
 
@@ -64,12 +64,12 @@ public class BookingService{
             throw new IllegalArgumentException("Date cannot be in the past");
         }
 
-//        boolean available = availabilityService.isWorkerAvailable(
-//                worker,
-//                bookingRequest.getDate(),
-//                bookingRequest.getStartTime(),
-//                bookingRequest.getEndTime()
-//        );
+        validateWorkerAvailability(
+                worker,
+                bookingRequest.getDate(),
+                bookingRequest.getStartTime(),
+                bookingRequest.getEndTime()
+        );
 
 
 
@@ -189,7 +189,7 @@ public class BookingService{
 
 
     public BookingResponseDto cancelBooking(Long bookingId, User company) {
-        if(company.getRole() != Role.Company){
+        if(company.getRole() != Role.COMPANY){
             throw new IllegalArgumentException("Only companies can cancel bookings");
         }
 
@@ -226,15 +226,63 @@ public class BookingService{
         return mapToBookingResponse(booking);
     }
 
+    @Transactional
     public void AutoRejectExpiredBookings(){
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime cutoff= LocalDateTime.now().plusDays(2);
 
-        List<Bookings> expiredBookings  = bookingRepository.findExpiredTRequestedBookings(now) ;
+        List<Bookings> expiredBookings  = bookingRepository.findExpiredRequestedBookings(cutoff) ;
         for(Bookings booking : expiredBookings){
             booking.setStatus(BookingStatus.AUTO_REJECTED);
 
         }
         bookingRepository.saveAll(expiredBookings);
     }
+
+
+    public Page<BookingResponseDto> getCompanyBookings(
+            User company,
+            Pageable pageable
+    ) {
+        return bookingRepository
+                .findByCompany(company, pageable)
+                .map(this::mapToBookingResponse);
+    }
+
+    public Page<BookingResponseDto> getWorkerBookings(
+            User worker,
+            Pageable pageable
+    ) {
+        return bookingRepository
+                .findByWorker(worker, pageable)
+                .map(this::mapToBookingResponse);
+    }
+    public void validateWorkerAvailability(
+            User worker,
+            LocalDate bookingDate,
+            LocalTime startTime,
+            LocalTime endTime
+    ) {
+
+        List<Availability_slot> slots =
+                availabilitySlotRepository
+                        .findByWorkerAndDateOrderByStartTime(worker ,bookingDate);
+
+
+        if (slots.isEmpty()) {
+            throw new IllegalStateException("Worker not available on this date");
+        }
+
+
+        boolean isCovered = slots.stream().anyMatch(slot ->
+                !slot.getStartTime().isAfter(startTime) &&
+                        !slot.getEndTime().isBefore(endTime)
+        );
+
+        if (!isCovered) {
+            throw new IllegalStateException("Worker not available for selected time slot");
+        }
+    }
+
+
 
 }

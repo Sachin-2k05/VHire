@@ -2,7 +2,7 @@ package com.example.VHire.Entity;
 
 public enum Role {
 
-    Company,
+    COMPANY,
 
-    Worker
+    WORKER
 }

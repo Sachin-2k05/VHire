@@ -14,7 +14,8 @@ import java.time.LocalTime;
 public class AvailabilityResponseDto {
 
 private Long  id  ;
-
+    private Long workerId;
+    private String workerName;
 private LocalDate date;
 private LocalTime startTime;
 private LocalTime endTime;

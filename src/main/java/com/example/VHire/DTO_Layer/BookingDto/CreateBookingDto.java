@@ -15,7 +15,7 @@ import java.time.LocalTime;
 public class CreateBookingDto {
 
     @NotNull
-    private Long worker_id;
+    private Long workerId;
     @NotNull
     private LocalDate date ;
     @NotNull

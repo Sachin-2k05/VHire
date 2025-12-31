@@ -45,7 +45,7 @@ public class WorkerProfileController {
     }
 
 
-    @GetMapping("/workerId")
+    @GetMapping("/{workerId}")
     @PreAuthorize("hasAnyRole('WORKER','COMPANY')")
     public ResponseEntity<WorkerProfileResponseDto> getWorkerProfile(
            @Valid @PathVariable Long workerId) {
