@@ -21,7 +21,7 @@ public class Availability_slot{
     @NonNull
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "worker_id", nullable = false)
     @NonNull
     private User worker;

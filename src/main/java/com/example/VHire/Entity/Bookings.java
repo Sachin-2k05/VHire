@@ -13,7 +13,17 @@ import java.time.LocalTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Bookings")
+@Table(name = "Bookings",
+        indexes = {
+                @Index(
+                        name = "idx_booking_status",
+                        columnList = "status"
+                ),
+                @Index(
+                        name = "idx_booking_response_deadline",
+                        columnList = "response_deadline"
+                )
+        })
 public class Bookings {
 
 
@@ -21,11 +31,11 @@ public class Bookings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private User company;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "worker_id", nullable = false)
     private User worker;
 
