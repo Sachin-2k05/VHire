@@ -1,4 +1,4 @@
-package com.example.VHire.Entity;
+package com.example.vHire.entity;
 
 
 import jakarta.persistence.*;
@@ -6,6 +6,7 @@ import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -22,11 +23,15 @@ public class WorkerProfile {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id" , nullable = false , unique = true)
     @NotNull
-    private User user;
+    private User worker;
 
-    @Column(nullable = false , length = 100)
-    @NotNull
-    private String skill ;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "worker_skills",
+            joinColumns = @JoinColumn(name = "worker_profile_id")
+    )
+    @Column(name = "skill")
+    private Set<String> skill ;
 
     @Column(nullable = false , precision = 8 , scale = 2)
     @NotNull

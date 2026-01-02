@@ -1,9 +1,10 @@
-package com.example.VHire.Controller;
+package com.example.vHire.controller;
 
 
-import com.example.VHire.DTO_Layer.UserDto.UserResponseDto;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Service.UserService;
+import com.example.vHire.dto_Layer.UserDto.UserResponseDto;
+import com.example.vHire.entity.User;
+import com.example.vHire.service.UserService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -36,6 +37,7 @@ public class UserController {
 
         return ResponseEntity.ok(userService.mapToUserResponse(worker));
     }
+
 
 
 

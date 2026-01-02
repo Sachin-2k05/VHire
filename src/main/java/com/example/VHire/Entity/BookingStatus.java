@@ -1,10 +1,4 @@
-package com.example.VHire.Entity;
-
-
-import jakarta.persistence.Entity;
-import lombok.Getter;
-import lombok.Setter;
-
+package com.example.vHire.entity;
 
 
 public enum BookingStatus {

@@ -1,4 +1,4 @@
-package com.example.VHire.Security.Auth;
+package com.example.vHire.security.Auth;
 
 
 import jakarta.validation.Valid;

@@ -1,17 +1,15 @@
-package com.example.VHire.Controller;
+package com.example.vHire.controller;
 
 
-import com.example.VHire.DTO_Layer.AvailabilityDto.AvailabilityRequestDto;
-import com.example.VHire.DTO_Layer.AvailabilityDto.AvailabilityResponseDto;
-import com.example.VHire.DTO_Layer.Common.ApiResponse;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Service.AvailabilityService;
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityRequestDto;
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityResponseDto;
+import com.example.vHire.dto_Layer.Common.ApiResponse;
+import com.example.vHire.entity.User;
+import com.example.vHire.service.AvailabilityService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

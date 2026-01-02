@@ -1,4 +1,4 @@
-package com.example.VHire.Security.Auth;
+package com.example.vHire.security.Auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -19,5 +19,5 @@ public class LoginRequestDto {
     @NotBlank
     private String password;
 
-    // getters & setters
+
 }

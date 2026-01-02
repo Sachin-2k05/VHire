@@ -1,10 +1,9 @@
-package com.example.VHire.DTO_Layer.WorkerProfileDto;
+package com.example.vHire.dto_Layer.WorkerProfileDto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.math.BigDecimal;
-
+import java.util.Set;
 
 
 @Data
@@ -15,7 +14,7 @@ import java.math.BigDecimal;
 public class createWorkerProfileDto {
 
     @NonNull
-    private String skills;
+    private Set<String> skills;
     @NonNull
     private Integer experienceYears;
     @NonNull

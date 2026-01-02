@@ -1,13 +1,13 @@
-package com.example.VHire.Service;
+package com.example.vHire.service;
 
-import com.example.VHire.DTO_Layer.AvailabilityDto.AvailabilityRequestDto;
-import com.example.VHire.DTO_Layer.AvailabilityDto.AvailabilityResponseDto;
-import com.example.VHire.Entity.Availability_slot;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Repository.AvailabilitySlotRepository;
-import com.example.VHire.Repository.BookingRepository;
-import com.example.VHire.Repository.UserRepository;
-import com.example.VHire.Repository.WorkerProfileRepository;
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityRequestDto;
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityResponseDto;
+import com.example.vHire.entity.Availability_slot;
+import com.example.vHire.entity.User;
+import com.example.vHire.repository.AvailabilitySlotRepository;
+import com.example.vHire.repository.BookingRepository;
+import com.example.vHire.repository.UserRepository;
+import com.example.vHire.repository.WorkerProfileRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

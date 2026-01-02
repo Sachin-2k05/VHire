@@ -1,4 +1,4 @@
-package com.example.VHire.DTO_Layer.UserDto;
+package com.example.vHire.dto_Layer.UserDto;
 
 
 import lombok.Data;
@@ -14,4 +14,5 @@ public class UserResponseDto {
     private String Email ;
     private String name ;
     private String role ;
+    private String city;
 }

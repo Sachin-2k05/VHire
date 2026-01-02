@@ -1,13 +1,11 @@
-package com.example.VHire.Service;
+package com.example.vHire.service;
 
-import com.example.VHire.DTO_Layer.WorkerProfileDto.createWorkerProfileDto;
-import com.example.VHire.DTO_Layer.WorkerProfileDto.UpdateWorkerProfileDto;
-import com.example.VHire.DTO_Layer.WorkerProfileDto.WorkerProfileResponseDto;
-import com.example.VHire.DTO_Layer.WorkerProfileDto.createWorkerProfileDto;
-import com.example.VHire.Entity.Role;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Entity.WorkerProfile;
-import com.example.VHire.Repository.WorkerProfileRepository;
+import com.example.vHire.dto_Layer.WorkerProfileDto.createWorkerProfileDto;
+import com.example.vHire.dto_Layer.WorkerProfileDto.UpdateWorkerProfileDto;
+import com.example.vHire.dto_Layer.WorkerProfileDto.WorkerProfileResponseDto;
+import com.example.vHire.entity.User;
+import com.example.vHire.entity.WorkerProfile;
+import com.example.vHire.repository.WorkerProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -33,12 +31,12 @@ public class WorkerProfileService{
             User worker,
             createWorkerProfileDto dto) {
 
-        if (workerProfileRepository.existsByUser(worker)) {
+        if (workerProfileRepository.existsByworker(worker)) {
             throw new IllegalStateException("Worker profile already exists");
         }
 
         WorkerProfile profile = new WorkerProfile();
-        profile.setUser(worker);
+        profile.setWorker(worker);
         profile.setSkill(dto.getSkills());
         profile.setExperienceYears(dto.getExperienceYears());
         profile.setHourly_rate(dto.getHourlyRate());
@@ -93,13 +91,13 @@ public class WorkerProfileService{
         WorkerProfile profile = getProfileEntityByWorker(worker);
 
         return profile.getSkill() != null &&
-                !profile.getSkill().isBlank() &&
+                !profile.getSkill().isEmpty() &&
                 profile.getHourly_rate() != null &&
                 profile.getExperienceYears() != null;
     }
 
     private WorkerProfile getProfileEntityByWorker(User worker) {
-        return workerProfileRepository.findByUser(worker)
+        return workerProfileRepository.findByWorker(worker)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Worker profile not found"));
     }
@@ -107,8 +105,8 @@ public class WorkerProfileService{
     private WorkerProfileResponseDto mapToResponse(WorkerProfile profile) {
 
         WorkerProfileResponseDto dto = new WorkerProfileResponseDto();
-        dto.setWorkerId((long) profile.getUser().getId());
-        dto.setWorkerName(profile.getUser().getName());
+        dto.setWorkerId((long) profile.getWorker().getId());
+        dto.setWorkerName(profile.getWorker().getName());
         dto.setSkills(profile.getSkill());
         dto.setExperienceYears(profile.getExperienceYears());
         dto.setHourlyRate(profile.getHourly_rate());

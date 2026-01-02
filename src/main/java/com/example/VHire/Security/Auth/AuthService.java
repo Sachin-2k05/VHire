@@ -1,10 +1,10 @@
-package com.example.VHire.Security.Auth;
+package com.example.vHire.security.Auth;
 
 
-import com.example.VHire.Entity.Role;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Repository.UserRepository;
-import com.example.VHire.Security.JWT.JwtTokenProvider;
+import com.example.vHire.entity.Role;
+import com.example.vHire.entity.User;
+import com.example.vHire.repository.UserRepository;
+import com.example.vHire.security.JWT.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,7 +37,7 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.valueOf(request.getRole()));
-
+        user.setCity(request.getCity());
         userRepository.save(user);
 
         return new SignUpResponseDto(

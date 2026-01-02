@@ -1,7 +1,7 @@
-package com.example.VHire.Repository;
+package com.example.vHire.repository;
 
-import com.example.VHire.Entity.Availability_slot;
-import com.example.VHire.Entity.User;
+import com.example.vHire.entity.Availability_slot;
+import com.example.vHire.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -40,4 +40,21 @@ public interface AvailabilitySlotRepository extends JpaRepository<Availability_s
     List<Availability_slot> findByWorker(User worker);
 
     LocalDate date(LocalDate date);
+    @Query("""
+        SELECT DISTINCT a.worker
+        FROM Availability_slot a
+        WHERE a.date = :date
+          AND a.worker.city = :city
+    """)
+    List<User> findAvailableWorkersByCityAndDate(
+            @Param("city") String city,
+            @Param("date") LocalDate date
+    );
+
+    boolean existsByWorkerAndDateAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+            User worker,
+            LocalDate date,
+            LocalTime startTime,
+            LocalTime endTime
+    );
 }

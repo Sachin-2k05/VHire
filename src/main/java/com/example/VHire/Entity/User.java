@@ -1,4 +1,4 @@
-package com.example.VHire.Entity;
+package com.example.vHire.entity;
 
 
 import jakarta.persistence.*;
@@ -67,6 +67,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean enabled = true;
 
+
+    @Column(nullable = false)
+    private String city;
 
 
 

@@ -1,15 +1,13 @@
-package com.example.VHire.Controller;
+package com.example.vHire.controller;
 
 
-import com.example.VHire.DTO_Layer.WorkerProfileDto.UpdateWorkerProfileDto;
-import com.example.VHire.DTO_Layer.WorkerProfileDto.WorkerProfileResponseDto;
-import com.example.VHire.DTO_Layer.WorkerProfileDto.createWorkerProfileDto;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Service.WorkerProfileService;
+import com.example.vHire.dto_Layer.WorkerProfileDto.UpdateWorkerProfileDto;
+import com.example.vHire.dto_Layer.WorkerProfileDto.WorkerProfileResponseDto;
+import com.example.vHire.dto_Layer.WorkerProfileDto.createWorkerProfileDto;
+import com.example.vHire.entity.User;
+import com.example.vHire.service.WorkerProfileService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

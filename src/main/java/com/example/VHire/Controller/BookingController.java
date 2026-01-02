@@ -1,31 +1,29 @@
-package com.example.VHire.Controller;
+package com.example.vHire.controller;
 
 
-import com.example.VHire.DTO_Layer.BookingDto.BookingResponseDto;
-import com.example.VHire.DTO_Layer.BookingDto.CreateBookingDto;
-import com.example.VHire.DTO_Layer.Common.ApiResponse;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Repository.AvailabilitySlotRepository;
-import com.example.VHire.Service.AvailabilityService;
-import com.example.VHire.Service.BookingService;
+import com.example.vHire.dto_Layer.BookingDto.BookingResponseDto;
+import com.example.vHire.dto_Layer.BookingDto.CreateBookingDto;
+import com.example.vHire.dto_Layer.Common.ApiResponse;
+import com.example.vHire.entity.User;
+import com.example.vHire.service.AvailabilityService;
+import com.example.vHire.service.BookingService;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/v1/bookings")
 public class BookingController {
     private final AvailabilityService availabilityService;
     private final BookingService bookingService;
-    public BookingController(BookingService bookingService,  AvailabilityService availabilityService) {
+
+    public BookingController(BookingService bookingService, AvailabilityService availabilityService) {
         this.bookingService = bookingService;
         this.availabilityService = availabilityService;
 
@@ -36,7 +34,6 @@ public class BookingController {
     public ResponseEntity<BookingResponseDto> CreateBooking(
             @AuthenticationPrincipal User company,
             @Valid @RequestBody CreateBookingDto dto) throws Throwable {
-
 
 
         return ResponseEntity.ok(
@@ -55,12 +52,11 @@ public class BookingController {
     }
 
 
-
     @PostMapping("/{BookingID}/reject")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<BookingResponseDto> rejectBooking(
             @AuthenticationPrincipal User worker
-            ,@PathVariable("BookingID") Long bookingID) {
+            , @PathVariable("BookingID") Long bookingID) {
 
         bookingService.rejectBooking(bookingID, worker);
         return ResponseEntity.notFound().build();
@@ -70,7 +66,7 @@ public class BookingController {
     @GetMapping("/id/{BookingID}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BookingResponseDto> getBooking(@PathVariable("BookingID") Long bookingID) {
-       return ResponseEntity.ok(bookingService.getBookingById(bookingID));
+        return ResponseEntity.ok(bookingService.getBookingById(bookingID));
 
     }
 
@@ -106,8 +102,20 @@ public class BookingController {
         );
     }
 
+    @PutMapping("/{bookingId}/cancel")
+    @PreAuthorize("hasRole('COMPANY')")
+    public ResponseEntity<BookingResponseDto> cancelBooking(
+            @PathVariable Long bookingId,
+            @AuthenticationPrincipal User company
+    ) {
+        BookingResponseDto response =
+                bookingService.cancelBooking(bookingId, company);
+
+        return ResponseEntity.ok(response);
+    }
 
 
 
 
-}
+    }
+

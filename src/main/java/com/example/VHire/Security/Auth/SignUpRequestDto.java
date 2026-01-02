@@ -1,4 +1,4 @@
-package com.example.VHire.Security.Auth;
+package com.example.vHire.security.Auth;
 
 
 import lombok.AllArgsConstructor;
@@ -17,4 +17,6 @@ public class SignUpRequestDto {
     private String email;
     private String password;
     private String role;
+    private String city;
+
 }

@@ -1,7 +1,7 @@
-package com.example.VHire.Security.JWT;
+package com.example.vHire.security.JWT;
 
 
-import com.example.VHire.Security.CustomUserDetailService;
+import com.example.vHire.security.CustomUserDetailService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

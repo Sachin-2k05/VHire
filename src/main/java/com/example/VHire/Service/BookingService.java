@@ -1,12 +1,12 @@
-package com.example.VHire.Service;
+package com.example.vHire.service;
 
-import com.example.VHire.DTO_Layer.BookingDto.BookingResponseDto;
-import com.example.VHire.DTO_Layer.BookingDto.CreateBookingDto;
-import com.example.VHire.Entity.*;
-import com.example.VHire.Repository.AvailabilitySlotRepository;
-import com.example.VHire.Repository.BookingRepository;
-import com.example.VHire.Repository.UserRepository;
-import com.example.VHire.Repository.WorkerProfileRepository;
+import com.example.vHire.dto_Layer.BookingDto.BookingResponseDto;
+import com.example.vHire.dto_Layer.BookingDto.CreateBookingDto;
+import com.example.vHire.entity.*;
+import com.example.vHire.repository.AvailabilitySlotRepository;
+import com.example.vHire.repository.BookingRepository;
+import com.example.vHire.repository.UserRepository;
+import com.example.vHire.repository.WorkerProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -201,7 +201,7 @@ public class BookingService{
 
         }
 
-        if(bookings.getStatus() != BookingStatus.COMPLETED){
+        if(bookings.getStatus() == BookingStatus.COMPLETED){
             throw new IllegalStateException("completed bookings cannot be cancelled ");
 
 

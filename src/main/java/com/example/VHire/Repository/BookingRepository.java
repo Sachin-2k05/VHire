@@ -1,7 +1,7 @@
-package com.example.VHire.Repository;
+package com.example.vHire.repository;
 
-import com.example.VHire.Entity.Bookings;
-import com.example.VHire.Entity.User;
+import com.example.vHire.entity.Bookings;
+import com.example.vHire.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
+
 @Repository
 public interface BookingRepository extends JpaRepository<Bookings,Long> {
 

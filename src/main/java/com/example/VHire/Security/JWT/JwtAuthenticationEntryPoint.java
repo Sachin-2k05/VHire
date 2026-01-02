@@ -1,4 +1,4 @@
-package com.example.VHire.Security.JWT;
+package com.example.vHire.security.JWT;
 
 public class JwtAuthenticationEntryPoint {
 }

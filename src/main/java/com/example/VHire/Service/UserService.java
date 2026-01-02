@@ -1,13 +1,13 @@
-package com.example.VHire.Service;
+package com.example.vHire.service;
 
 
-import com.example.VHire.DTO_Layer.UserDto.UserResponseDto;
-import com.example.VHire.Entity.Role;
-import com.example.VHire.Entity.User;
-import com.example.VHire.Repository.AvailabilitySlotRepository;
-import com.example.VHire.Repository.BookingRepository;
-import com.example.VHire.Repository.UserRepository;
-import com.example.VHire.Repository.WorkerProfileRepository;
+import com.example.vHire.dto_Layer.UserDto.UserResponseDto;
+import com.example.vHire.entity.Role;
+import com.example.vHire.entity.User;
+import com.example.vHire.repository.AvailabilitySlotRepository;
+import com.example.vHire.repository.BookingRepository;
+import com.example.vHire.repository.UserRepository;
+import com.example.vHire.repository.WorkerProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +68,7 @@ public class UserService {
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole().name());
+        dto.setCity(user.getCity());
 
         return dto;
     }

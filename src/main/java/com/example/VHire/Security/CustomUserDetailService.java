@@ -1,14 +1,13 @@
-package com.example.VHire.Security;
+package com.example.vHire.security;
 
 
-import com.example.VHire.Entity.User;
-import com.example.VHire.Repository.UserRepository;
+import com.example.vHire.entity.User;
+import com.example.vHire.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 @Service
 public class CustomUserDetailService implements UserDetailsService {
     private final UserRepository userRepository;

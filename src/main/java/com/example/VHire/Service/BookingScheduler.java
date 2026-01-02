@@ -1,6 +1,5 @@
-package com.example.VHire.Service;
+package com.example.vHire.service;
 
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

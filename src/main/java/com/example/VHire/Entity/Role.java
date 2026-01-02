@@ -1,4 +1,4 @@
-package com.example.VHire.Entity;
+package com.example.vHire.entity;
 
 public enum Role {
 

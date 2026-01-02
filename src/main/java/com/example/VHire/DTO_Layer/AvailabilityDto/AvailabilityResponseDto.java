@@ -1,4 +1,4 @@
-package com.example.VHire.DTO_Layer.AvailabilityDto;
+package com.example.vHire.dto_Layer.AvailabilityDto;
 
 import lombok.Data;
 import lombok.Getter;

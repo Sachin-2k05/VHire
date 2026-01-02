@@ -1,8 +1,9 @@
-package com.example.VHire.DTO_Layer.WorkerProfileDto;
+package com.example.vHire.dto_Layer.WorkerProfileDto;
 
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 @Getter
@@ -15,7 +16,7 @@ public class WorkerProfileResponseDto {
 
     private String workerName;
 
-    private String skills;
+    private Set<String> skills;
 
     private Integer experienceYears;
 

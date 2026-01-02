@@ -1,4 +1,4 @@
-package com.example.VHire.DTO_Layer.Common;
+package com.example.vHire.dto_Layer.Common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

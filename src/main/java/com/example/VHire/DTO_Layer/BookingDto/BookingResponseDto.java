@@ -1,4 +1,4 @@
-package com.example.VHire.DTO_Layer.BookingDto;
+package com.example.vHire.dto_Layer.BookingDto;
 
 import lombok.*;
 
