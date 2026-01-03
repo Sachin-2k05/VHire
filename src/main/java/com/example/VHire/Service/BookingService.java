@@ -104,6 +104,7 @@ public class BookingService{
 
     private BookingResponseDto mapToBookingResponse(Bookings booking) {
         BookingResponseDto dto = new BookingResponseDto();
+        dto.setWorkerName(booking.getWorker().getName());
         dto.setBookingId(booking.getId());
         dto.setCompanyName(booking.getCompany().getName());
         dto.setStartTime(booking.getStartTime());

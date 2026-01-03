@@ -3,6 +3,7 @@ package com.example.vHire.controller;
 
 import com.example.vHire.dto_Layer.UserDto.workerResponsedto;
 import com.example.vHire.entity.User;
+import com.example.vHire.security.CustomUserDetail;
 import com.example.vHire.service.WorkerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,13 +28,13 @@ public class WorkerController {
     @GetMapping
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<List<workerResponsedto>> getAvailableWorkers(
-            @AuthenticationPrincipal User company,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @RequestParam LocalDate date
     ) {
 
         List<workerResponsedto> workers =
                 workerService.getAvailableWorkersByCityAndDate(
-                        company.getCity(),
+                        customUserDetail.getUser().getCity(),
                         date
                 );
 

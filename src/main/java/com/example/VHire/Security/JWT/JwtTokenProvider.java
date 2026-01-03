@@ -1,6 +1,7 @@
 package com.example.vHire.security.JWT;
 
 import com.example.vHire.entity.User;
+import com.example.vHire.security.CustomUserDetail;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +28,11 @@ public class JwtTokenProvider {
         this.jwtExpirationMs = jwtExpirationMs;
     }
 
-    public String generateToken(User user) {
+    public String generateToken(CustomUserDetail  customUserDetail) {
 
         return Jwts.builder()
-                .setSubject(user.getEmail())
+                .setSubject(customUserDetail.getUsername())
+                .claim("role", customUserDetail.getUser().getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(
                         new Date(System.currentTimeMillis() + jwtExpirationMs)

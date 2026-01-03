@@ -5,6 +5,7 @@ import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityRequestDto;
 import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityResponseDto;
 import com.example.vHire.dto_Layer.Common.ApiResponse;
 import com.example.vHire.entity.User;
+import com.example.vHire.security.CustomUserDetail;
 import com.example.vHire.service.AvailabilityService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,10 +28,10 @@ public class AvailabilityController {
 
     @PostMapping
     @PreAuthorize("hasRole('WORKER')")
-    public ResponseEntity<Void> createAvailability(@AuthenticationPrincipal User worker, @Valid @RequestBody AvailabilityRequestDto availabilityRequestDto) {
+    public ResponseEntity<Void> createAvailability(@AuthenticationPrincipal CustomUserDetail customUserDetail, @Valid @RequestBody AvailabilityRequestDto availabilityRequestDto) {
 
 
-        availabilityService.createAvailability(worker , availabilityRequestDto);
+        availabilityService.createAvailability(customUserDetail.getUser() , availabilityRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
@@ -48,21 +49,21 @@ public class AvailabilityController {
     @DeleteMapping("/{availabilityID}")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Void> deleteAvailability(
-            @AuthenticationPrincipal User worker,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @Valid @PathVariable Long availabilityID) {
 
-        availabilityService.removeAvailabilitySlot(availabilityID, worker);
+        availabilityService.removeAvailabilitySlot(availabilityID, customUserDetail.getUser());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
     @GetMapping("/me")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<List<AvailabilityResponseDto>> getMyAvailability(
-            @AuthenticationPrincipal User worker) {
+            @AuthenticationPrincipal CustomUserDetail customUserDetail) {
 
 
         return ResponseEntity.ok(
-                availabilityService.getAvailability(worker)
+                availabilityService.getAvailability(customUserDetail.getUser())
         );
     }
     @GetMapping("/search")

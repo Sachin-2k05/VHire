@@ -4,6 +4,7 @@ package com.example.vHire.security.Auth;
 import com.example.vHire.entity.Role;
 import com.example.vHire.entity.User;
 import com.example.vHire.repository.UserRepository;
+import com.example.vHire.security.CustomUserDetail;
 import com.example.vHire.security.JWT.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,13 +57,14 @@ public class AuthService {
                 )
         );
 
-        User user = (User) authentication.getPrincipal();
-        String token = jwtTokenProvider.generateToken(user);
+        CustomUserDetail userDetails =
+                (CustomUserDetail) authentication.getPrincipal();
+        String token = jwtTokenProvider.generateToken((userDetails));
         return new LoginResponseDto(
                 token ,
-                user.getId()
+                userDetails.getUser().getId()
                 ,
-                user.getEmail()
+                userDetails.getUser().getEmail()
         );
     }
 

@@ -3,6 +3,7 @@ package com.example.vHire.controller;
 
 import com.example.vHire.dto_Layer.UserDto.UserResponseDto;
 import com.example.vHire.entity.User;
+import com.example.vHire.security.CustomUserDetail;
 import com.example.vHire.service.UserService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.http.ResponseEntity;
@@ -32,10 +33,10 @@ public class UserController {
 
     @GetMapping("/myProfile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserResponseDto> GetCurrentUser(@AuthenticationPrincipal User worker) {
+    public ResponseEntity<UserResponseDto> GetCurrentUser(@AuthenticationPrincipal CustomUserDetail  customUserDetail) {
 
 
-        return ResponseEntity.ok(userService.mapToUserResponse(worker));
+        return ResponseEntity.ok(userService.mapToUserResponse(customUserDetail.getUser()));
     }
 
 

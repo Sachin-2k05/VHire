@@ -5,6 +5,7 @@ import com.example.vHire.dto_Layer.WorkerProfileDto.UpdateWorkerProfileDto;
 import com.example.vHire.dto_Layer.WorkerProfileDto.WorkerProfileResponseDto;
 import com.example.vHire.dto_Layer.WorkerProfileDto.createWorkerProfileDto;
 import com.example.vHire.entity.User;
+import com.example.vHire.security.CustomUserDetail;
 import com.example.vHire.service.WorkerProfileService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,20 +27,20 @@ public class WorkerProfileController {
 
     @PostMapping
     @PreAuthorize("hasRole('WORKER')")
-    public ResponseEntity<WorkerProfileResponseDto> CreateWorkerProfile( @AuthenticationPrincipal User worker,
-                                                                         @Valid @RequestBody createWorkerProfileDto Dto) {
+    public ResponseEntity<WorkerProfileResponseDto> CreateWorkerProfile(@AuthenticationPrincipal CustomUserDetail customUserDetail,
+                                                                        @Valid @RequestBody createWorkerProfileDto Dto) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(workerProfileService.createProfile(worker, Dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(workerProfileService.createProfile(customUserDetail.getUser(), Dto));
 
     }
 
 @PutMapping
 @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<WorkerProfileResponseDto> UpdateWorkerProfile(
-        @AuthenticationPrincipal User worker
+        @AuthenticationPrincipal CustomUserDetail customUserDetail
         ,@Valid @RequestBody UpdateWorkerProfileDto Dto) {
 
-        return ResponseEntity.ok(workerProfileService.updateProfile(worker, Dto));
+        return ResponseEntity.ok(workerProfileService.updateProfile(customUserDetail.getUser(), Dto));
     }
 
 
@@ -56,13 +57,13 @@ public class WorkerProfileController {
     @GetMapping("/me")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<WorkerProfileResponseDto> getMyProfile(
-            @AuthenticationPrincipal User worker
+            @AuthenticationPrincipal CustomUserDetail customUserDetail
     ) {
 
 
 
         return ResponseEntity.ok(
-                workerProfileService.getProfileByWorker(worker)
+                workerProfileService.getProfileByWorker(customUserDetail.getUser())
         );
     }
 

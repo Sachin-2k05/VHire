@@ -5,6 +5,8 @@ import com.example.vHire.dto_Layer.BookingDto.BookingResponseDto;
 import com.example.vHire.dto_Layer.BookingDto.CreateBookingDto;
 import com.example.vHire.dto_Layer.Common.ApiResponse;
 import com.example.vHire.entity.User;
+import com.example.vHire.security.CustomUserDetail;
+import com.example.vHire.security.CustomUserDetailService;
 import com.example.vHire.service.AvailabilityService;
 import com.example.vHire.service.BookingService;
 import jakarta.annotation.PostConstruct;
@@ -32,12 +34,12 @@ public class BookingController {
     @PostMapping
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<BookingResponseDto> CreateBooking(
-            @AuthenticationPrincipal User company,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @Valid @RequestBody CreateBookingDto dto) throws Throwable {
 
 
         return ResponseEntity.ok(
-                bookingService.createBooking(company, dto)
+                bookingService.createBooking(customUserDetail.getUser(), dto)
         );
     }
 
@@ -45,20 +47,20 @@ public class BookingController {
     @PostMapping("/{BookingID}/accept")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<BookingResponseDto> acceptBooking(
-            @AuthenticationPrincipal User worker,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @PathVariable("BookingID") Long bookingID) {
 
-        return ResponseEntity.ok(bookingService.acceptBooking(bookingID, worker));
+        return ResponseEntity.ok(bookingService.acceptBooking(bookingID, customUserDetail.getUser()));
     }
 
 
     @PostMapping("/{BookingID}/reject")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<BookingResponseDto> rejectBooking(
-            @AuthenticationPrincipal User worker
+            @AuthenticationPrincipal CustomUserDetail customUserDetail
             , @PathVariable("BookingID") Long bookingID) {
 
-        bookingService.rejectBooking(bookingID, worker);
+        bookingService.rejectBooking(bookingID, customUserDetail.getUser());
         return ResponseEntity.notFound().build();
     }
 
@@ -73,7 +75,7 @@ public class BookingController {
     @GetMapping("/company")
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<ApiResponse<Page<BookingResponseDto>>> getCompanyBookings(
-            @AuthenticationPrincipal User company,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -81,7 +83,7 @@ public class BookingController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Company bookings fetched",
-                        bookingService.getCompanyBookings(company, pageable)
+                        bookingService.getCompanyBookings(customUserDetail.getUser(), pageable)
                 )
         );
     }
@@ -89,7 +91,7 @@ public class BookingController {
     @GetMapping("/worker")
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<ApiResponse<Page<BookingResponseDto>>> getWorkerBookings(
-            @AuthenticationPrincipal User worker,
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "1") int size
     ) {
@@ -97,7 +99,7 @@ public class BookingController {
         return ResponseEntity.ok(
                 ApiResponse.success(
                         "Worker bookings fetched",
-                        bookingService.getWorkerBookings(worker, pageable)
+                        bookingService.getWorkerBookings(customUserDetail.getUser(), pageable)
                 )
         );
     }
@@ -106,10 +108,10 @@ public class BookingController {
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<BookingResponseDto> cancelBooking(
             @PathVariable Long bookingId,
-            @AuthenticationPrincipal User company
+            @AuthenticationPrincipal CustomUserDetail customUserDetail
     ) {
         BookingResponseDto response =
-                bookingService.cancelBooking(bookingId, company);
+                bookingService.cancelBooking(bookingId, customUserDetail.getUser());
 
         return ResponseEntity.ok(response);
     }
