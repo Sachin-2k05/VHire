@@ -52,9 +52,7 @@ public class BookingService{
         User worker = userRepository.findById(bookingRequest.getWorkerId())
                 .orElseThrow(() -> new IllegalArgumentException("Worker not found"));
 
-        if (worker.getRole() != Role.WORKER) {
-            throw new IllegalArgumentException("Selected user is not a worker");
-        }
+
 
         if (!bookingRequest.getStartTime().isBefore(bookingRequest.getEndTime())) {
             throw new IllegalArgumentException("Start time must be before end time");
