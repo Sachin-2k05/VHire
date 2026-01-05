@@ -190,14 +190,12 @@ public class BookingService{
 
 
     public BookingResponseDto cancelBooking(Long bookingId, User company) {
-        if(company.getRole() != Role.COMPANY){
-            throw new IllegalArgumentException("Only companies can cancel bookings");
-        }
+
 
         Bookings bookings = bookingRepository.findById(bookingId).orElseThrow(()-> new IllegalArgumentException("Booking not found"));
 
 
-        if(bookings.getCompany().getId() != (company.getId())){
+        if(!bookings.getCompany().getId().equals (company.getId())){
             throw new IllegalArgumentException("onlly companies can cancel this booking ");
 
         }
