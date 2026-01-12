@@ -33,13 +33,15 @@ public class BookingController {
 
     @PostMapping
     @PreAuthorize("hasRole('COMPANY')")
-    public ResponseEntity<BookingResponseDto> CreateBooking(
+    public ResponseEntity<ApiResponse<BookingResponseDto>> CreateBooking(
             @AuthenticationPrincipal CustomUserDetail customUserDetail,
             @Valid @RequestBody CreateBookingDto dto) throws Throwable {
 
 
         return ResponseEntity.ok(
-                bookingService.createBooking(customUserDetail.getUser(), dto)
+                ApiResponse.success(
+                        "booking created successfully",
+                bookingService.createBooking(customUserDetail.getUser(), dto))
         );
     }
 

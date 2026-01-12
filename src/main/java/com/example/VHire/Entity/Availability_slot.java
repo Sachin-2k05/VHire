@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "Availbility_slots")
+@Table(name = "Availability_slots")
 public class Availability_slot{
 
     @Id

@@ -64,7 +64,8 @@ public class AuthService {
                 token ,
                 userDetails.getUser().getId()
                 ,
-                userDetails.getUser().getEmail()
+                userDetails.getUser().getEmail(),
+                "login successful"
         );
     }
 
