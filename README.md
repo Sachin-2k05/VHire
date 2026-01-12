@@ -202,46 +202,8 @@ Availability_Slots: Time-bound slots linked to Workers.
 
 Bookings: Transactions linking Companies, Workers, and specific Slots.
 
-▶️ Running the Project Locally
-
-1. Prerequisites
-
-JDK 17
-MySQL Server
-Maven
-
-3. Installation
-   
-# Clone the repository
-
-git clone https://github.com/Sachin-2k05/VHire.git
-
-# Navigate to the directory
-
-cd VHire
-
-3. Configuration
-
-Update src/main/resources/application.properties (or application-dev.properties):
-
-Properties
-
-spring.datasource.url=jdbc:mysql://localhost:3306/vhire
-
-spring.datasource.username=your_username
-
-spring.datasource.password=your_password
-
-spring.jpa.hibernate.ddl-auto=validate
-
-4. Build and Run
-   
-mvn clean install
-
-mvn spring-boot:run
-
-
 🚧 Future Enhancements
+
 OAuth2 Integration: Support for Google/GitHub social logins.
 
 Refresh Tokens: Enhancing security for long-lived sessions.
