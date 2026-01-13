@@ -63,11 +63,13 @@ public class BookingController {
             , @PathVariable("BookingID") Long bookingID) {
 
         bookingService.rejectBooking(bookingID, customUserDetail.getUser());
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(
+                bookingService.rejectBooking(bookingID, customUserDetail.getUser())
+        );
     }
 
 
-    @GetMapping("/id/{BookingID}")
+    @GetMapping("/{BookingID}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BookingResponseDto> getBooking(@PathVariable("BookingID") Long bookingID) {
         return ResponseEntity.ok(bookingService.getBookingById(bookingID));

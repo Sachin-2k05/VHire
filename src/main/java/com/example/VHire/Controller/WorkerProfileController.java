@@ -47,7 +47,7 @@ public class WorkerProfileController {
     @GetMapping("/{workerId}")
     @PreAuthorize("hasAnyRole('WORKER','COMPANY')")
     public ResponseEntity<WorkerProfileResponseDto> getWorkerProfile(
-           @Valid @PathVariable Long workerId) {
+           @PathVariable Long workerId) {
        return ResponseEntity.ok(workerProfileService.getProfileByWorkerId(workerId));
 
 
