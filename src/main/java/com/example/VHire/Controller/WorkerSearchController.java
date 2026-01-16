@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @RestController
-@RequestMapping("/companies/workers")
+@RequestMapping("/api/v1/companies/workers")
 @PreAuthorize("hasRole('COMPANY')")
 public class WorkerSearchController {
 
@@ -33,12 +34,15 @@ public class WorkerSearchController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
+            @RequestParam(required = false) Integer minExperienceYears,
+            @RequestParam(required = false) BigDecimal maxHourlyRate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return workerSearchService.searchWorkers(
-                skill, city, date, startTime, endTime, pageable
+                skill, city, date, startTime, endTime,  minExperienceYears,
+                 maxHourlyRate,pageable
         );
     }
 }

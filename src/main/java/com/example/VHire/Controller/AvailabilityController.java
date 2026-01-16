@@ -50,22 +50,13 @@ public class AvailabilityController {
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<Void> deleteAvailability(
             @AuthenticationPrincipal CustomUserDetail customUserDetail,
-            @Valid @PathVariable Long availabilityID) {
+             @PathVariable Long availabilityID) {
 
         availabilityService.removeAvailabilitySlot(availabilityID, customUserDetail.getUser());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
     }
-    @GetMapping("/me")
-    @PreAuthorize("hasRole('WORKER')")
-    public ResponseEntity<List<AvailabilityResponseDto>> getMyAvailability(
-            @AuthenticationPrincipal CustomUserDetail customUserDetail) {
 
-
-        return ResponseEntity.ok(
-                availabilityService.getAvailability(customUserDetail.getUser())
-        );
-    }
     @GetMapping("/search")
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<ApiResponse<List<AvailabilityResponseDto>>> searchAvailability(
@@ -75,6 +66,20 @@ public class AvailabilityController {
                 ApiResponse.success(
                         "Available workers fetched",
                         availabilityService.findAvailabilityByDate(date)
+                )
+        );
+
+    }
+    @GetMapping("/mySlots")
+    @PreAuthorize("hasRole('WORKER')")
+    public ResponseEntity<List<AvailabilityResponseDto>> getMySlots(
+            @AuthenticationPrincipal CustomUserDetail userDetail,
+            @RequestParam LocalDate date
+    ) {
+        return ResponseEntity.ok(
+                availabilityService.getMyAvailabilityByDate(
+                        userDetail.getUser(),
+                        date
                 )
         );
     }

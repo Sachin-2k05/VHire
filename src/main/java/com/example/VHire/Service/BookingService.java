@@ -1,5 +1,6 @@
 package com.example.vHire.service;
 
+import com.example.vHire.Config.EmailTemplates;
 import com.example.vHire.dto_Layer.BookingDto.BookingResponseDto;
 import com.example.vHire.dto_Layer.BookingDto.CreateBookingDto;
 import com.example.vHire.entity.*;
@@ -23,7 +24,7 @@ import java.util.List;
 @Transactional
 public class BookingService{
 
-
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final WorkerProfileRepository workerProfileRepository;
@@ -32,12 +33,14 @@ public class BookingService{
     public BookingService(UserRepository userRepository,
                           BookingRepository bookingRepository,
                           WorkerProfileRepository workerProfileRepository,
-                          AvailabilitySlotRepository availabilitySlotRepository
+                          AvailabilitySlotRepository availabilitySlotRepository,
+                          EmailService emailService
                           ) {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.workerProfileRepository = workerProfileRepository;
         this.availabilitySlotRepository = availabilitySlotRepository;
+        this.emailService = emailService;
 
     }
 
@@ -93,6 +96,15 @@ public class BookingService{
         booking.setResponseDeadline(LocalDateTime.now().plusDays(2));
 
         bookingRepository.save(booking);
+        emailService.sendHtmlEmail(
+                worker.getEmail(),
+                "New Booking Request",
+                EmailTemplates.bookingRequest(
+                        company.getName(),
+                        booking.getDate().toString(),
+                        booking.getStartTime() + " - " + booking.getEndTime()
+                )
+        );
 
         return mapToBookingResponse(booking);
     }
@@ -157,6 +169,15 @@ public class BookingService{
 
         booking.setStatus(BookingStatus.ACCEPTED);
         bookingRepository.save(booking);
+        emailService.sendHtmlEmail(
+                booking.getCompany().getEmail(),
+                "Booking Accepted",
+                EmailTemplates.bookingAccepted(
+                        booking.getWorker().getName(),
+                        booking.getDate().toString(),
+                        booking.getStartTime() + " - " + booking.getEndTime()
+                )
+        );
 
         return mapToBookingResponse(booking);
     }
@@ -180,6 +201,13 @@ public class BookingService{
 
         booking.setStatus(BookingStatus.REJECTED_BY_WORKER);
         bookingRepository.save(booking);
+         emailService.sendHtmlEmail(
+                 booking.getCompany().getEmail(),
+                 "Booking Rejected",
+                 EmailTemplates.bookingRejected(
+                         booking.getWorker().getName()
+                 )
+         );
         return mapToBookingResponse(booking);
 
 
@@ -212,7 +240,7 @@ public class BookingService{
     }
 
 
-    public BookingResponseDto getBookingById(long bookingId) {
+    public BookingResponseDto getBookingById(long bookingId , User user) {
         Bookings booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() ->
                         new EntityNotFoundException(
@@ -253,7 +281,7 @@ public class BookingService{
                 .findByWorker(worker, pageable)
                 .map(this::mapToBookingResponse);
     }
-    public void validateWorkerAvailability(
+    public Availability_slot validateWorkerAvailability(
             User worker,
             LocalDate bookingDate,
             LocalTime startTime,
@@ -262,22 +290,34 @@ public class BookingService{
 
         List<Availability_slot> slots =
                 availabilitySlotRepository
-                        .findByWorkerAndDateOrderByStartTime(worker ,bookingDate);
-
+                        .findByWorkerAndDateOrderByStartTime(worker, bookingDate);
 
         if (slots.isEmpty()) {
             throw new IllegalStateException("Worker not available on this date");
         }
 
+        Availability_slot coveringSlot = slots.stream()
+                .filter(slot ->
+                        !slot.getStartTime().isAfter(startTime) &&
+                                !slot.getEndTime().isBefore(endTime)
+                )
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException("Worker not available for selected time slot")
+                );
 
-        boolean isCovered = slots.stream().anyMatch(slot ->
-                !slot.getStartTime().isAfter(startTime) &&
-                        !slot.getEndTime().isBefore(endTime)
-        );
 
-        if (!isCovered) {
-            throw new IllegalStateException("Worker not available for selected time slot");
+        boolean alreadyBooked =
+                bookingRepository.existsByWorkerAndDateAndStartTimeLessThanAndEndTimeGreaterThan(  worker,
+                        bookingDate,
+                        endTime,
+                        startTime);
+
+        if (alreadyBooked) {
+            throw new IllegalStateException("Selected slot is already booked");
         }
+
+        return coveringSlot;
     }
 
 

@@ -62,25 +62,29 @@ public class BookingController {
             @AuthenticationPrincipal CustomUserDetail customUserDetail
             , @PathVariable("BookingID") Long bookingID) {
 
-        bookingService.rejectBooking(bookingID, customUserDetail.getUser());
+        BookingResponseDto response = bookingService.rejectBooking(bookingID, customUserDetail.getUser());
         return ResponseEntity.ok(
-                bookingService.rejectBooking(bookingID, customUserDetail.getUser())
-        );
+               response)
+        ;
     }
 
 
-    @GetMapping("/{BookingID}")
+    @GetMapping("/{bookingId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<BookingResponseDto> getBooking(@PathVariable("BookingID") Long bookingID) {
-        return ResponseEntity.ok(bookingService.getBookingById(bookingID));
+    public ResponseEntity<BookingResponseDto> getBooking(
+            @AuthenticationPrincipal CustomUserDetail customUserDetail,
+            @PathVariable Long bookingId) {
 
+        return ResponseEntity.ok(
+                bookingService.getBookingById(bookingId, customUserDetail.getUser())
+        );
     }
 
     @GetMapping("/company")
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<ApiResponse<Page<BookingResponseDto>>> getCompanyBookings(
             @AuthenticationPrincipal CustomUserDetail customUserDetail,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = (Pageable) PageRequest.of(page, size);
@@ -96,7 +100,7 @@ public class BookingController {
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<ApiResponse<Page<BookingResponseDto>>> getWorkerBookings(
             @AuthenticationPrincipal CustomUserDetail customUserDetail,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int page,
             @RequestParam(defaultValue = "1") int size
     ) {
         Pageable pageable = (Pageable) PageRequest.of(page, size);

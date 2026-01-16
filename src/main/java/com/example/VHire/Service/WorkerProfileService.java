@@ -35,8 +35,11 @@ public class WorkerProfileService{
             throw new IllegalStateException("Worker profile already exists");
         }
 
+
         WorkerProfile profile = new WorkerProfile();
         profile.setWorker(worker);
+        profile.getWorker().getName();
+
         profile.setSkill(dto.getSkills());
         profile.setExperienceYears(dto.getExperienceYears());
         profile.setHourly_rate(dto.getHourlyRate());
@@ -76,7 +79,7 @@ public class WorkerProfileService{
     }
 
 
-
+@Transactional
     public WorkerProfileResponseDto getProfileByWorker(User worker) {
 
         WorkerProfile profile = getProfileEntityByWorker(worker);
@@ -96,7 +99,7 @@ public class WorkerProfileService{
                 profile.getExperienceYears() != null;
     }
 
-    private WorkerProfile getProfileEntityByWorker(User worker) {
+    public WorkerProfile getProfileEntityByWorker(User worker) {
         return workerProfileRepository.findByWorker(worker)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Worker profile not found"));

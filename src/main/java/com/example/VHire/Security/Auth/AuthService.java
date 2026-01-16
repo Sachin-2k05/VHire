@@ -65,10 +65,10 @@ public class AuthService {
                 userDetails.getUser().getId()
                 ,
                 userDetails.getUser().getEmail(),
-                "login successful"
+                "login successful",
+                userDetails.getUser().getRole().name()
         );
     }
 
 
 }
-

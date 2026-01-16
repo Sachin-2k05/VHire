@@ -2,6 +2,7 @@ package com.example.vHire.repository;
 
 import com.example.vHire.entity.Availability_slot;
 import com.example.vHire.entity.User;
+import com.example.vHire.entity.WorkerProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,7 +40,7 @@ public interface AvailabilitySlotRepository extends JpaRepository<Availability_s
      List<Availability_slot> findByDate(LocalDate date);
     List<Availability_slot> findByWorker(User worker);
 
-    LocalDate date(LocalDate date);
+//    LocalDate date(LocalDate date);
     @Query("""
         SELECT DISTINCT a.worker
         FROM Availability_slot a
@@ -57,4 +58,9 @@ public interface AvailabilitySlotRepository extends JpaRepository<Availability_s
             LocalTime startTime,
             LocalTime endTime
     );
+    List<Availability_slot> findByWorkerAndDate(
+            User worker,
+            LocalDate date
+    );
+
 }

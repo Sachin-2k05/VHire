@@ -1,5 +1,6 @@
 package com.example.vHire.repository;
 
+import com.example.vHire.entity.Availability_slot;
 import com.example.vHire.entity.Bookings;
 import com.example.vHire.entity.User;
 import org.springframework.data.domain.Page;
@@ -44,4 +45,10 @@ public interface BookingRepository extends JpaRepository<Bookings,Long> {
         Page<Bookings> findByWorker(User worker, Pageable pageable);
 
 
+    boolean existsByWorkerAndDateAndStartTimeLessThanAndEndTimeGreaterThan(
+            User worker,
+            LocalDate bookingDate,
+            LocalTime endTime,
+            LocalTime startTime
+    );
 }

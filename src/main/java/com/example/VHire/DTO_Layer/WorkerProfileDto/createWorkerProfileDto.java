@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class createWorkerProfileDto {
-
+     private String firstName;
     @NonNull
     private Set<String> skills;
     @NonNull

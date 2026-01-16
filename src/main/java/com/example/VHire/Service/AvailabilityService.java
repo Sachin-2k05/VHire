@@ -8,7 +8,9 @@ import com.example.vHire.repository.AvailabilitySlotRepository;
 import com.example.vHire.repository.BookingRepository;
 import com.example.vHire.repository.UserRepository;
 import com.example.vHire.repository.WorkerProfileRepository;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -120,4 +122,15 @@ public class AvailabilityService {
                 .map(this::mapToAvailabilityResponse)
                 .collect(Collectors.toList());
     }
+    @Transactional(readOnly = true)
+    public List<AvailabilityResponseDto> getMyAvailabilityByDate(
+            User worker,
+            LocalDate date
+    ) {
+        return availabilitySlotRepository.findByWorkerAndDate(worker, date)
+                .stream()
+                .map(this::mapToAvailabilityResponse)
+                .toList();
+    }
+
 }

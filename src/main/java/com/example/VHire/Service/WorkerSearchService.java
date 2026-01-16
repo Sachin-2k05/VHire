@@ -8,32 +8,31 @@ import com.example.vHire.repository.AvailabilitySlotRepository;
 import com.example.vHire.repository.UserRepository;
 import com.example.vHire.repository.WorkerProfileRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
-
 @Service
 @Transactional
 public class WorkerSearchService {
+
     private final UserRepository userRepository;
     private final WorkerProfileRepository workerProfileRepository;
     private final AvailabilitySlotRepository availabilitySlotRepository;
 
-    public WorkerSearchService(UserRepository userRepository, WorkerProfileRepository workerProfileRepository, AvailabilitySlotRepository availabilitySlotRepository) {
+    public WorkerSearchService(
+            UserRepository userRepository,
+            WorkerProfileRepository workerProfileRepository,
+            AvailabilitySlotRepository availabilitySlotRepository
+    ) {
         this.userRepository = userRepository;
         this.workerProfileRepository = workerProfileRepository;
         this.availabilitySlotRepository = availabilitySlotRepository;
-
     }
 
     public Page<WorkerSearchResponseDto> searchWorkers(
@@ -42,32 +41,57 @@ public class WorkerSearchService {
             LocalDate date,
             LocalTime startTime,
             LocalTime endTime,
+            Integer minExperienceYears,
+            BigDecimal maxHourlyRate,
             Pageable pageable
     ) {
 
+        /* ================= DEFAULT SORT (NO RANDOM DATA) ================= */
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "name").descending()
+        );
+
+        /* ================= BASE QUERY ================= */
         Page<User> workers =
                 (city != null && !city.isBlank())
-                        ? userRepository.findAllByRoleAndCity(Role.WORKER, city, pageable)
-                        : userRepository.findByRole(Role.WORKER, pageable);
+                        ? userRepository.findAllByRoleAndCity(Role.WORKER, city, sortedPageable)
+                        : userRepository.findByRole(Role.WORKER, sortedPageable);
 
+        /* ================= MAP + FILTER (SAFE) ================= */
         List<WorkerSearchResponseDto> result =
                 workers.getContent().stream()
                         .map(worker -> {
 
                             WorkerProfile profile =
-                                    workerProfileRepository.findByWorker(worker)
-                                            .orElse(null);
+                                    workerProfileRepository.findByWorker(worker).orElse(null);
 
                             if (profile == null) return null;
 
-                            if (skill != null &&
-                                    profile.getSkill().stream()
-                                            .noneMatch(s -> s.equalsIgnoreCase(skill))) {
+                            /* ---- SKILL FILTER ---- */
+                            if (skill != null && !skill.isBlank()) {
+                                boolean match =
+                                        profile.getSkill().stream()
+                                                .anyMatch(s ->
+                                                        s.equalsIgnoreCase(skill.trim()));
+                                if (!match) return null;
+                            }
+
+                            /* ---- EXPERIENCE FILTER ---- */
+                            if (minExperienceYears != null &&
+                                    profile.getExperienceYears() < minExperienceYears) {
                                 return null;
                             }
 
-                            boolean available = true;
+                            /* ---- RATE FILTER ---- */
+                            if (maxHourlyRate != null &&
+                                    profile.getHourly_rate().compareTo(maxHourlyRate) > 0) {
+                                return null;
+                            }
 
+                            /* ---- AVAILABILITY FILTER ---- */
+                            boolean available = true;
                             if (date != null && startTime != null && endTime != null) {
                                 available =
                                         availabilitySlotRepository
@@ -81,12 +105,19 @@ public class WorkerSearchService {
                         .filter(Objects::nonNull)
                         .toList();
 
-        return new PageImpl<>(result, pageable, result.size());
-
-
+        /* ================= RETURN CORRECT PAGE ================= */
+        return new PageImpl<>(
+                result,
+                sortedPageable,
+                workers.getTotalElements()
+        );
     }
 
-    private WorkerSearchResponseDto mapToDto(User worker, WorkerProfile profile, boolean available) {
+    private WorkerSearchResponseDto mapToDto(
+            User worker,
+            WorkerProfile profile,
+            boolean available
+    ) {
         WorkerSearchResponseDto dto = new WorkerSearchResponseDto();
         dto.setWorkerId(worker.getId());
         dto.setName(worker.getName());
@@ -98,5 +129,3 @@ public class WorkerSearchService {
         return dto;
     }
 }
-
-

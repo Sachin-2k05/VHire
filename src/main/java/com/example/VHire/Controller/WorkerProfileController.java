@@ -34,7 +34,7 @@ public class WorkerProfileController {
 
     }
 
-@PutMapping
+@PutMapping("/me")
 @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<WorkerProfileResponseDto> UpdateWorkerProfile(
         @AuthenticationPrincipal CustomUserDetail customUserDetail
