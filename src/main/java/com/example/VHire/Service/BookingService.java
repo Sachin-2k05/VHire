@@ -120,6 +120,9 @@ public class BookingService{
         dto.setStartTime(booking.getStartTime());
         dto.setEndTime(booking.getEndTime());
         dto.setDate(booking.getDate());
+        dto.setBookingDate(booking.getDate());
+        dto.setCreateAt(booking.getCreatedAt());
+
         dto.setStatus(booking.getStatus().name());
         return dto;
     }

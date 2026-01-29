@@ -87,18 +87,18 @@ public class AvailabilityService {
 
     }
 
-    public List<AvailabilityResponseDto> getAvailability(User worker ) {
-
-
-
-        List<Availability_slot> slots =
-                availabilitySlotRepository
-                        .findByWorkerOrderByDateAscStartTimeAsc(worker);
-
-        return slots.stream()
-                .map(this::mapToAvailabilityResponse)
-                .toList();
-    }
+//    public List<AvailabilityResponseDto> getAvailability(User worker ) {
+//
+//
+//
+//        List<Availability_slot> slots =
+//                availabilitySlotRepository
+//                        .findByWorkerOrderByDateAscStartTimeAsc(worker);
+//
+//        return slots.stream()
+//                .map(this::mapToAvailabilityResponse)
+//                .toList();
+//    }
     private AvailabilityResponseDto mapToAvailabilityResponse(Availability_slot availability) {
 
         AvailabilityResponseDto dto = new AvailabilityResponseDto();

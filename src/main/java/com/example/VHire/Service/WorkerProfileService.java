@@ -1,5 +1,7 @@
 package com.example.vHire.service;
 
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityRequestDto;
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityResponseDto;
 import com.example.vHire.dto_Layer.WorkerProfileDto.createWorkerProfileDto;
 import com.example.vHire.dto_Layer.WorkerProfileDto.UpdateWorkerProfileDto;
 import com.example.vHire.dto_Layer.WorkerProfileDto.WorkerProfileResponseDto;
@@ -9,6 +11,8 @@ import com.example.vHire.repository.WorkerProfileRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Transactional
@@ -109,6 +113,19 @@ public class WorkerProfileService{
 
         WorkerProfileResponseDto dto = new WorkerProfileResponseDto();
         dto.setWorkerId((long) profile.getWorker().getId());
+        dto.setCity(profile.getCity());
+        dto.setEmail(profile.getWorker().getEmail());
+        if (profile.getAvailabilities() != null) {
+            List<AvailabilityRequestDto> availabilityList = profile.getAvailabilities().stream()
+                    .map(slot -> new AvailabilityRequestDto(
+                            slot.getDate(),
+                            slot.getStartTime(),
+                            slot.getEndTime()
+                    )) // Removed .toString()
+                    .toList(); // Added to collect the stream into a list
+
+            dto.setAvailabilities(availabilityList);
+        }
         dto.setWorkerName(profile.getWorker().getName());
         dto.setSkills(profile.getSkill());
         dto.setExperienceYears(profile.getExperienceYears());

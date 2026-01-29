@@ -1,5 +1,7 @@
 package com.example.vHire.service;
 
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityRequestDto;
+import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityResponseDto;
 import com.example.vHire.dto_Layer.UserDto.WorkerSearchResponseDto;
 import com.example.vHire.entity.Role;
 import com.example.vHire.entity.User;
@@ -16,6 +18,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional
@@ -46,79 +50,41 @@ public class WorkerSearchService {
             Pageable pageable
     ) {
 
-        /* ================= DEFAULT SORT (NO RANDOM DATA) ================= */
         Pageable sortedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "name").descending()
+                Sort.by("worker.name").descending()
         );
 
-        /* ================= BASE QUERY ================= */
-        Page<User> workers =
-                (city != null && !city.isBlank())
-                        ? userRepository.findAllByRoleAndCity(Role.WORKER, city, sortedPageable)
-                        : userRepository.findByRole(Role.WORKER, sortedPageable);
+        Page<WorkerProfile> profiles =
+                workerProfileRepository.searchWorkers(
+                        city,
+                        skill,
+                        minExperienceYears,
+                        maxHourlyRate,
+                        sortedPageable
+                );
 
-        /* ================= MAP + FILTER (SAFE) ================= */
-        List<WorkerSearchResponseDto> result =
-                workers.getContent().stream()
-                        .map(worker -> {
+        return profiles.map(profile -> {
 
-                            WorkerProfile profile =
-                                    workerProfileRepository.findByWorker(worker).orElse(null);
+            User worker = profile.getWorker();
 
-                            if (profile == null) return null;
+            boolean available = true;
+            if (date != null && startTime != null && endTime != null) {
+                available =
+                        availabilitySlotRepository
+                                .existsByWorkerAndDateAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+                                        worker, date, startTime, endTime
+                                );
+            }
 
-                            /* ---- SKILL FILTER ---- */
-                            if (skill != null && !skill.isBlank()) {
-                                boolean match =
-                                        profile.getSkill().stream()
-                                                .anyMatch(s ->
-                                                        s.equalsIgnoreCase(skill.trim()));
-                                if (!match) return null;
-                            }
-
-                            /* ---- EXPERIENCE FILTER ---- */
-                            if (minExperienceYears != null &&
-                                    profile.getExperienceYears() < minExperienceYears) {
-                                return null;
-                            }
-
-                            /* ---- RATE FILTER ---- */
-                            if (maxHourlyRate != null &&
-                                    profile.getHourly_rate().compareTo(maxHourlyRate) > 0) {
-                                return null;
-                            }
-
-                            /* ---- AVAILABILITY FILTER ---- */
-                            boolean available = true;
-                            if (date != null && startTime != null && endTime != null) {
-                                available =
-                                        availabilitySlotRepository
-                                                .existsByWorkerAndDateAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-                                                        worker, date, startTime, endTime
-                                                );
-                            }
-
-                            return mapToDto(worker, profile, available);
-                        })
-                        .filter(Objects::nonNull)
-                        .toList();
-
-        /* ================= RETURN CORRECT PAGE ================= */
-        return new PageImpl<>(
-                result,
-                sortedPageable,
-                workers.getTotalElements()
-        );
+            return mapToDto(worker, profile, available);
+        });
     }
 
-    private WorkerSearchResponseDto mapToDto(
-            User worker,
-            WorkerProfile profile,
-            boolean available
-    ) {
+    private WorkerSearchResponseDto mapToDto(User worker, WorkerProfile profile, boolean available) {
         WorkerSearchResponseDto dto = new WorkerSearchResponseDto();
+
         dto.setWorkerId(worker.getId());
         dto.setName(worker.getName());
         dto.setCity(worker.getCity());
@@ -126,6 +92,25 @@ public class WorkerSearchService {
         dto.setExperienceYears(profile.getExperienceYears());
         dto.setHourlyRate(profile.getHourly_rate());
         dto.setAvailable(available);
+
+        if (profile.getAvailabilities() != null) {
+            List<AvailabilityResponseDto> availabilityList = profile.getAvailabilities().stream()
+                    .map(slot -> {
+                        // Use the no-args constructor and setters to avoid parameter mismatch
+                        AvailabilityResponseDto res = new AvailabilityResponseDto();
+                        res.setId(slot.getId());
+                        res.setWorkerId(worker.getId());
+                        res.setWorkerName(worker.getName());
+                        res.setDate(slot.getDate());
+                        res.setStartTime(slot.getStartTime());
+                        res.setEndTime(slot.getEndTime());
+                        return res;
+                    })
+                    .toList();
+
+            dto.setAvailabilities(availabilityList);
+        }
+
         return dto;
     }
 }

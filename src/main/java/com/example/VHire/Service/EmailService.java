@@ -10,13 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+@Autowired
+    public JavaMailSender javaMailSender;
+
 
     public void sendHtmlEmail(String to, String subject, String htmlBody) {
 
         try {
-            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper =
                     new MimeMessageHelper(message, true, "UTF-8");
 
@@ -25,7 +26,7 @@ public class EmailService {
             helper.setText(htmlBody, true);
             helper.setFrom("s05357259@gmail.com");
 
-            mailSender.send(message);
+            javaMailSender.send(message);
 
         } catch (MessagingException e) {
             throw new RuntimeException("Email sending failed", e);

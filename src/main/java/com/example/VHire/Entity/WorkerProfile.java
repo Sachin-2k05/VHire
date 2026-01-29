@@ -6,6 +6,7 @@ import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -47,5 +48,15 @@ public class WorkerProfile {
     @NotNull
     @Column(nullable = false)
     private boolean active = true ;
+
+    @NotNull
+    private String city ;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "worker_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private List<Availability_slot> availabilities;
+
+
+
 }
 

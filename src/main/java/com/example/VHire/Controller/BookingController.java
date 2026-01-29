@@ -84,7 +84,7 @@ public class BookingController {
     @PreAuthorize("hasRole('COMPANY')")
     public ResponseEntity<ApiResponse<Page<BookingResponseDto>>> getCompanyBookings(
             @AuthenticationPrincipal CustomUserDetail customUserDetail,
-            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = (Pageable) PageRequest.of(page, size);
@@ -100,8 +100,8 @@ public class BookingController {
     @PreAuthorize("hasRole('WORKER')")
     public ResponseEntity<ApiResponse<Page<BookingResponseDto>>> getWorkerBookings(
             @AuthenticationPrincipal CustomUserDetail customUserDetail,
-            @RequestParam(defaultValue = "10") int page,
-            @RequestParam(defaultValue = "1") int size
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = (Pageable) PageRequest.of(page, size);
         return ResponseEntity.ok(

@@ -3,6 +3,7 @@ package com.example.vHire.dto_Layer.BookingDto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
@@ -28,4 +29,7 @@ public class BookingResponseDto {
     private LocalTime endTime;
 
     private String Status ;
+    private LocalDateTime createAt;
+    private LocalDate bookingDate;
+
 }
