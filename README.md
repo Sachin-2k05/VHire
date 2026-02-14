@@ -129,7 +129,7 @@ All large result sets use database-level pagination via `Pageable` and `Page<T>`
 * `POST /api/v1/bookings/{id}/accept`
 
 > **Note:** Full documentation is available via Swagger at `http://localhost:8080/swagger-ui.html` once the application is running.
-> if you want the full project the must connect it from frontend repository on my profile 
+> if you want the full project then connect it from frontend repository on my profile 
 
 ---
 
