@@ -64,6 +64,10 @@ public class WorkerSearchService {
                         maxHourlyRate,
                         sortedPageable
                 );
+        System.out.println("skill = " + skill);
+        System.out.println("city = " + city);
+        System.out.println("minExp = " + minExperienceYears);
+        System.out.println("maxRate = " + maxHourlyRate);
 
         return profiles.map(profile -> {
 
@@ -80,6 +84,7 @@ public class WorkerSearchService {
 
             return mapToDto(worker, profile, available);
         });
+
     }
 
     private WorkerSearchResponseDto mapToDto(User worker, WorkerProfile profile, boolean available) {

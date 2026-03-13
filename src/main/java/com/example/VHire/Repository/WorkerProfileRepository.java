@@ -27,9 +27,8 @@ public interface WorkerProfileRepository extends JpaRepository<WorkerProfile,Int
 SELECT wp FROM WorkerProfile wp
 JOIN wp.worker u
 WHERE u.role = 'WORKER'
-AND wp.active = true
-AND (:city IS NULL OR wp.city = :city)
-AND (:skill IS NULL OR :skill MEMBER OF wp.skill)
+AND (:city IS NULL OR :city = '' OR LOWER(wp.city) = LOWER(:city))
+AND (:skill IS NULL OR :skill = '' OR :skill MEMBER OF wp.skill)
 AND (:minExp IS NULL OR wp.experienceYears >= :minExp)
 AND (:maxRate IS NULL OR wp.Hourly_rate <= :maxRate)
 """)
@@ -41,3 +40,4 @@ AND (:maxRate IS NULL OR wp.Hourly_rate <= :maxRate)
             Pageable pageable
     );
 }
+//AND wp.active = true
