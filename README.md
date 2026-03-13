@@ -1,220 +1,168 @@
-🚀 VHire – Role-Based Hiring Platform (Backend)
+# 🚀 VHire – Role-Based Hiring Platform (Backend)
 
-VHire is a robust backend system designed to facilitate secure, role-based interactions between Companies and Workers. Built with a focus on real-world backend design, the platform emphasizes strict authentication, granular authorization, and a controlled booking lifecycle.
+VHire is a production-oriented backend system designed to facilitate secure, role-based interactions between **Companies** and **Workers**. The platform focuses on real-world backend concerns such as stateless authentication, fine-grained authorization, strict business rule enforcement, and controlled state transitions.
 
-Unlike basic CRUD applications, VHire implements a complex state machine for availability-driven hiring and enforces security at the method level.
+Unlike basic CRUD applications, VHire implements a state-driven booking workflow, enforces method-level security, and models real hiring constraints such as availability windows, role ownership, and transition validation.
 
-🧠 Problem Statement
+---
+
+## 🧠 Problem Statement
 
 In many real-world hiring scenarios—especially for short-term or task-based work—companies struggle to find workers with clear availability, while workers face unstructured job requests and poor scheduling control.
 
-Common issues include:
+**Common issues include:**
+* Companies sending booking requests without knowing if a worker is available.
+* Workers receiving overlapping or last-minute requests.
+* Lack of accountability over who can accept, cancel, or modify a booking.
+* No clear ownership of actions once a booking is created.
 
-Companies sending booking requests without knowing if a worker is actually available
-Workers receiving overlapping or last-minute requests
+**These problems lead to:**
+* Missed work opportunities and scheduling conflicts.
+* Poor trust between companies and workers.
+* Manual coordination outside the platform.
 
-Lack of accountability around who can accept, cancel, or modify a booking
-,No clear ownership of actions once a booking is created
+---
 
-These issues lead to:
-Missed work opportunities,
-Scheduling conflicts,
-Poor trust between companies and workers
-,Manual coordination outside the platform
+## 💡 Solution Overview
 
-VHire aims to solve this by providing a backend-driven hiring workflow where:
+VHire introduces a backend-driven hiring workflow where:
+1.  **Workers** explicitly define availability slots.
+2.  **Companies** can only request bookings within valid availability windows.
+3.  Each action (request, accept, reject, cancel) is **strictly role-controlled**.
+4.  **Booking state transitions** are validated to prevent invalid workflows.
 
-Workers explicitly declare when they are available
+The result is a predictable, secure, and scalable hiring system that mirrors how real-world platforms manage temporary or skill-based work engagements.
 
-Companies can only request bookings within valid availability windows
+---
 
-Each action (request, accept, reject, cancel) is strictly role-controlled
+## 🛠️ Tech Stack
 
-Booking transitions are validated to prevent inconsistent or invalid states
+| Category | Technology |
+| :--- | :--- |
+| **Language** | Java 17 |
+| **Framework** | Spring Boot 3.x |
+| **Security** | Spring Security, JWT (Stateless) |
+| **Persistence** | Spring Data JPA (Hibernate) |
+| **Database** | MySQL |
+| **Build Tool** | Maven |
+| **Documentation** | Swagger / OpenAPI |
+| **Email** | JavaMailSender (SMTP) |
 
-The result is a predictable, secure, and scalable hiring process that mirrors how real-world platforms manage temporary or skill-based work engagements.
+---
 
-Now the flow is:
+## 🔐 Security Architecture
 
-Problem → Impact → Solution → Implementation
+### Authentication
+VHire uses stateless **JWT-based authentication**. Users authenticate via email and password and receive a JWT token, which must be included in the header:
+`Authorization: Bearer <token>`
 
-🛠️ Tech Stack
+### Authorization
+Role-based access is enforced at the method level using `@PreAuthorize`.
+* **👷 Worker:** Can manage profile, availability, and respond to bookings.
+* **🏢 Company:** Can browse workers, create booking requests, and manage hiring history.
 
-Category	Technology
+This ensures **zero trust** by default and prevents role escalation.
 
-Language-	Java 17
+---
 
-Framework- Spring Boot 3.x
+## 📧 Email Notification System
 
-Security-	Spring Security, JWT (Stateless)
+VHire includes an event-driven email notification system to simulate real-world platform behavior. Emails are triggered automatically for key workflow events:
 
-Persistence-	Spring Data JPA (Hibernate)
+* 📩 **Booking request sent** (Company → Worker)
+* ✅ **Booking accepted** (Worker → Company)
+* ❌ **Booking rejected**
+* 🚫 **Booking cancelled**
 
-Database-	MySQL
+**Implementation Details:**
+* Built using `JavaMailSender`.
+* Configurable via environment variables.
+* Fully decoupled from business logic using a dedicated `EmailService`.
 
-Build Tool-	Maven
+---
 
-🔐 Security Architecture
-Authentication
-VHire utilizes Stateless JWT-based authentication. Users authenticate via email and password to receive a token, which must be included in the Authorization: Bearer <token> header for subsequent requests.
+## 📦 Core Features
 
-Authorization
-Role-based access is enforced at the Method Level using @PreAuthorize.
+### 1. User & Role Management
+* Unified User entity with role-based behavior.
+* JWT-backed stateless sessions.
+* Method-level authorization.
 
-👷 Worker: Can manage profiles, define availability slots, and respond to booking requests.
+### 2. Worker Profile Management
+Workers manage profiles containing **Skills, Experience, Hourly Rate, and Bio**. Profiles include an activation flag to control public visibility. Companies can view profiles but cannot modify them.
 
-🏢 Company: Can browse workers, initiate booking requests, and manage their hiring history.
+### 3. Availability Management
+Workers define when they are available. Business rules enforced:
+* No past dates.
+* No overlapping availability slots.
+* No availability during already accepted bookings.
 
-📦 Core Features
-1️⃣ User & Role Management
+### 4. Booking Management (State Machine)
 
-Unified User entity with role-based behavior
 
-Role-specific access enforced via Spring Security
+Bookings follow a strict lifecycle:
+`REQUESTED` ➔ `ACCEPTED / REJECTED` ➔ `COMPLETED / CANCELLED`
 
-JWT-backed session handling (stateless)
+* **Company:** Browse workers, create requests, cancel bookings.
+* **Worker:** View incoming requests, accept/reject bookings.
+* **Validation:** All transitions are validated server-side. No invalid states.
 
-2️⃣ Worker Profile Management (Worker Side)
+### 5. Pagination & Data Access
+All large result sets use database-level pagination via `Pageable` and `Page<T>` to prevent over-fetching and improve API performance.
 
-Workers can create and update profiles containing:
-Skills
+---
 
-Experience (years)
+## 🧾 API Overview
 
-Hourly rate
+### Authentication
+* `POST /api/v1/auth/signup`
+* `POST /api/v1/auth/login`
 
-Bio
+### Worker Profiles
+* `GET /api/v1/worker-profiles/me`
+* `GET /api/v1/worker-profiles/{id}`
+* `POST /api/v1/worker-profiles`
 
-Profiles include an activation flag to control visibility
+### Availability & Bookings
+* `POST /api/v1/availability`
+* `POST /api/v1/bookings`
+* `POST /api/v1/bookings/{id}/accept`
 
-Companies can view worker profiles, but cannot modify them
+> **Note:** Full documentation is available via Swagger at `http://localhost:8080/swagger-ui.html` once the application is running.
+> if you want the full project then connect it from frontend repository on my profile 
 
-3️⃣ Availability Management (Worker Side)
+---
 
-Workers define when they are available to work.
+## 🔁 DTO-Driven Design
 
-Business rules enforced:
+VHire never exposes JPA entities directly. All external communication uses **Data Transfer Objects (DTOs)**.
 
- No past dates
- 
- No overlapping availability slots
- 
- No availability during already accepted bookings
+* **Security:** No accidental sensitive field exposure.
+* **Loose Coupling:** API remains stable even if the database schema changes.
+* **Validation:** Strong request validation at the entry point.
 
-This ensures clean scheduling and prevents double-booking.
+---
 
-4️⃣ Booking Management (Company + Worker)
+## 🗄️ Database Design
 
-A structured booking lifecycle connects companies and workers.
+Core relational entities include:
+* **Users:** Credentials and roles.
+* **Worker_Profiles:** Worker metadata.
+* **Availability_Slots:** Time-bound availability.
+* **Bookings:** Company ↔ Worker transactions.
 
-Company capabilities:-
+---
 
-Browse worker profiles
+## 🚧 Future Enhancements
+* OAuth2 (Google/GitHub login).
+* Refresh Token implementation.
+* Advanced filtering (skills, rates, location).
+* Message queue (RabbitMQ/Kafka) for async emails.
+* Dockerized deployment.
 
-Create booking requests for specific dates & time slots
+---
 
-Cancel bookings when required
-
-View booking history (paginated)
-
-Worker capabilities:-
-
-View incoming booking requests
-
-Accept or reject bookings
-
-View assigned and past bookings (paginated)
-
-All transitions are validated server-side to maintain data integrity.
-
-5️⃣ Pagination & Data Access Control
-
- Large result sets (bookings) are paginated at the database level
- 
- Uses Spring Data `Pageable` and `Page<T>`
- 
- Prevents over-fetching and improves API performance
-  
-🧾 API Overview
-Authentication
-POST /api/v1/auth/signup - Register a new account.
-
-POST /api/v1/auth/login - Authenticate and receive JWT.
-
-Worker Profiles
-
-GET /api/v1/worker-profiles/me - View own profile (Worker only).
-
-GET /api/v1/worker-profiles/{id} - Public/Company view of worker details.
-
-POST /api/v1/worker-profiles - Create/Update profile data.
-
-
-Availability & Bookings
-
-POST /api/v1/availability - Set available slots.
-
-POST /api/v1/bookings - Company initiates a request.
-
-POST /api/v1/bookings/{id}/accept - Worker accepts a request.
-
-remaining APIs are documented using Swagger (OpenAPI).
-
-After running the application, access:
-
-http://localhost:8080/swagger-ui.html
-
-Swagger supports JWT authentication via the Authorize button.
-
-🔁 DTO-Driven Design (Why DTOs Instead of Entities)
-
-VHire never exposes JPA entities directly to the API layer.
-
-All external communication is done using DTOs.
-
-Reasons for Using DTOs:
-
-🔐 Security – Prevents accidental exposure of internal fields (IDs, flags, relations)
-
-🔄 Loose Coupling – API contracts remain stable even if entities change
-
-📦 Validation – Request DTOs enforce input constraints
-
-🧩 Clear Boundaries – Clean separation between persistence and API models
-
-DTO Types Used:
-
-Request DTOs – For input validation
-
-Response DTOs – For controlled API output
-
-Auth DTOs – For login/signup responses
-
-🗄️ Database Design
-
-The schema is optimized for relational integrity with the following core entities:
-
-Users: Core credentials and role assignment.
-
-Worker_Profiles: Metadata linked to User IDs.
-
-Availability_Slots: Time-bound slots linked to Workers.
-
-Bookings: Transactions linking Companies, Workers, and specific Slots.
-
-🚧 Future Enhancements
-
-OAuth2 Integration: Support for Google/GitHub social logins.
-
-Refresh Tokens: Enhancing security for long-lived sessions.
-
-Filtering: Advanced search for worker profiles based on skills/rates.
-
-Admin Dashboard: For platform moderation and user management.
-
-👤 Author
-Sachin
-
-Backend-focused Engineering Student
-
-Specializing in Java, Spring Boot, and cloud computing 
+## 👤 Author
+**Sachin Sharma**
+*Backend-Focused Engineering Student*
+*Specializing in Java, Spring Boot, and Scalable Systems.*
