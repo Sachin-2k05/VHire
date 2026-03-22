@@ -3,6 +3,7 @@ package com.example.vHire.service;
 import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityRequestDto;
 import com.example.vHire.dto_Layer.AvailabilityDto.AvailabilityResponseDto;
 import com.example.vHire.dto_Layer.UserDto.WorkerSearchResponseDto;
+import com.example.vHire.entity.Availability_slot;
 import com.example.vHire.entity.Role;
 import com.example.vHire.entity.User;
 import com.example.vHire.entity.WorkerProfile;
@@ -16,8 +17,11 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -64,23 +68,34 @@ public class WorkerSearchService {
                         maxHourlyRate,
                         sortedPageable
                 );
-        System.out.println("skill = " + skill);
-        System.out.println("city = " + city);
-        System.out.println("minExp = " + minExperienceYears);
-        System.out.println("maxRate = " + maxHourlyRate);
 
+// Step 1: extract workers
+        List<User> workers = profiles.stream()
+                .map(WorkerProfile::getWorker)
+                .toList();
+
+        Set<Long> availableWorkerIds = new HashSet<>();
+
+// Step 2: batch query (ONLY once)
+        if (date != null && startTime != null && endTime != null && !workers.isEmpty()) {
+
+            List<Availability_slot> slots =
+                    availabilitySlotRepository.findAvailableWorkers(
+                            workers, date, startTime, endTime
+                    );
+
+            availableWorkerIds = slots.stream()
+                    .map(slot -> slot.getWorker().getId())
+                    .collect(Collectors.toSet());
+        }
+
+        Set<Long> finalAvailableWorkerIds = availableWorkerIds;
+
+// Step 3: mapping (NO DB calls)
         return profiles.map(profile -> {
-
             User worker = profile.getWorker();
 
-            boolean available = true;
-            if (date != null && startTime != null && endTime != null) {
-                available =
-                        availabilitySlotRepository
-                                .existsByWorkerAndDateAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-                                        worker, date, startTime, endTime
-                                );
-            }
+            boolean available = finalAvailableWorkerIds.contains(worker.getId());
 
             return mapToDto(worker, profile, available);
         });
@@ -98,24 +113,7 @@ public class WorkerSearchService {
         dto.setHourlyRate(profile.getHourly_rate());
         dto.setAvailable(available);
 
-        if (profile.getAvailabilities() != null) {
-            List<AvailabilityResponseDto> availabilityList = profile.getAvailabilities().stream()
-                    .map(slot -> {
-                        // Use the no-args constructor and setters to avoid parameter mismatch
-                        AvailabilityResponseDto res = new AvailabilityResponseDto();
-                        res.setId(slot.getId());
-                        res.setWorkerId(worker.getId());
-                        res.setWorkerName(worker.getName());
-                        res.setDate(slot.getDate());
-                        res.setStartTime(slot.getStartTime());
-                        res.setEndTime(slot.getEndTime());
-                        return res;
-                    })
-                    .toList();
-
-            dto.setAvailabilities(availabilityList);
-        }
-
         return dto;
     }
-}
+    }
+

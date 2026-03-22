@@ -4,6 +4,7 @@ import com.example.vHire.entity.User;
 import com.example.vHire.entity.WorkerProfile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,10 +24,12 @@ public interface WorkerProfileRepository extends JpaRepository<WorkerProfile,Int
     List<WorkerProfile> findBySkillContainingIgnoreCaseAndActiveTrue(
             String skill
     );
+
+    @EntityGraph(attributePaths = {"worker", "skill"})
     @Query("""
-SELECT wp FROM WorkerProfile wp
-JOIN wp.worker u
-WHERE u.role = 'WORKER'
+
+            SELECT wp FROM WorkerProfile wp
+WHERE wp.worker.role = 'WORKER'
 AND (:city IS NULL OR :city = '' OR LOWER(wp.city) = LOWER(:city))
 AND (:skill IS NULL OR :skill = '' OR :skill MEMBER OF wp.skill)
 AND (:minExp IS NULL OR wp.experienceYears >= :minExp)
@@ -39,5 +42,5 @@ AND (:maxRate IS NULL OR wp.Hourly_rate <= :maxRate)
             @Param("maxRate") BigDecimal maxRate,
             Pageable pageable
     );
-}
+    }
 //AND wp.active = true

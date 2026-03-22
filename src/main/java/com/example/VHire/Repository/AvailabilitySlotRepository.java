@@ -63,4 +63,17 @@ public interface AvailabilitySlotRepository extends JpaRepository<Availability_s
             LocalDate date
     );
 
+    @Query("""
+    SELECT a FROM Availability_slot a
+    WHERE a.worker IN :workers
+    AND a.date = :date
+    AND a.startTime <= :startTime
+    AND a.endTime >= :endTime
+    """)
+    List<Availability_slot> findAvailableWorkers(
+            @Param("workers") List<User> workers,
+            @Param("date") LocalDate date,
+            @Param("startTime") LocalTime startTime,
+            @Param("endTime") LocalTime endTime
+    );
 }
